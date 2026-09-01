@@ -1,7 +1,7 @@
 {
   "name": "@kne/react-modal",
-  "version": "0.1.1",
-  "description": "基于 antd 的 React 弹窗组件，提供 Modal/useModal、Tabs 分栏布局与 renderModal 适配，支持 SimpleBar 滚动与移动端全屏。",
+  "version": "0.1.4",
+  "description": "基于 antd 的 React 弹层组件，提供 Modal/Drawer、useModal/useDrawer/useConfirmModal、共用 TabsLayout/ScrollRegion 布局与 createModalRender/createDrawerRender，支持 SimpleBar 与移动端适配。",
   "syntax": {
     "esmodules": true
   },
@@ -49,10 +49,13 @@
   "keywords": [
     "react",
     "modal",
+    "drawer",
     "antd",
     "dialog",
     "simplebar",
     "use-modal",
+    "use-drawer",
+    "use-confirm-modal",
     "footer-buttons",
     "tabs-layout",
     "mobile",

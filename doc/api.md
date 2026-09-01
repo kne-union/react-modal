@@ -52,6 +52,39 @@
 |------|------|------|
 | modal | function | 调用后弹出 Modal；返回 `{ close }`；默认 `zIndex` 为 1100 |
 
+### useConfirmModal
+
+命令式确认 / 提示弹窗，底层走 antd `App.modal` 的 `confirm` / `info` / `success` / `warning` / `error`。需在 antd `App` 上下文中使用。
+
+#### 参数
+
+| 属性 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| type | `confirm` \| `info` \| `success` \| `warning` \| `error` | `confirm` | 调用 `modal[type]` |
+| title | ReactNode | - | 标题 |
+| message | ReactNode | - | 正文 |
+| danger | boolean | false | 为 true 时展示语义图标，确认钮危险色 |
+| confirmType | `info` \| `warning` \| `error` \| `success` | `info` | `type=confirm` 时图标语义 |
+| icon | ReactNode | - | 自定义图标，覆盖默认 |
+| onConfirm | function | - | 映射 antd `onOk` |
+| onCancel | function | - | 映射 antd `onCancel` |
+| confirmText | ReactNode | - | 映射 `okText` |
+| cancelText | ReactNode | - | 映射 `cancelText` |
+| onClose | function | - | 调用 `close()` 时触发 |
+| maskClosable | boolean | false | 默认不可点蒙层关闭 |
+| getContainer | HTMLElement \| function | - | 嵌套时挂到外层 modal 外侧 |
+| afterClose / zIndex / wrapClassName | - | - | 透传；默认 `zIndex` 1100 |
+
+其余未列出参数按 antd Modal.confirm 习惯透传。
+
+#### 返回值
+
+| 属性 | 类型 | 描述 |
+|------|------|------|
+| confirmModal | function | 调用后弹出确认框；返回 `{ close }` |
+
+与 `useModal` 对比：专用于短文案确认 / 提示，桌面居中窄宽（约 400px），无 SimpleBar body。
+
 ### CSS 变量
 
 挂在 `.modal` / `.modal-outer` 上，可业务覆盖。
@@ -71,33 +104,33 @@
 | `--kne-modal-content-min-height` | content 侧 min |
 | `--kne-modal-content-width` | 内容宽度契约（扣 horizontal padding） |
 
-### 布局组合
+### 布局组合（Modal / Drawer 共用）
 
-Tabs / N 列分栏等复杂内容区须 **`bodyScroll={false}`**，由 `ModalScrollRegion`（SimpleBar）分区滚动，避免与 Modal body 双层 SimpleBar。
+Tabs / N 列分栏等复杂内容区须 **`bodyScroll={false}`**，由 `ScrollRegion`（SimpleBar）分区滚动，避免与弹层 body 双层 SimpleBar。
 
-#### ModalTabsLayout
+#### TabsLayout
 
-antd `Tabs` 封装：顶栏占 title 位（配合无 `title` 的 Modal）、antd6 高度链、`destroyOnHidden` 默认 true。其余 props 透传 Tabs。
+antd `Tabs` 封装：顶栏占 title 位（配合无 `title` 的弹层）、antd6 高度链、`destroyOnHidden` 默认 true。其余 props 透传 Tabs。
 
-#### ModalColumnsLayout
+#### ColumnsLayout
 
 固定 N 列 flex 分栏。`widths` 与 `children` 等长（如 `['36%', '1fr']`、`['200px', '1fr', '280px']`）；`'1fr'` 占剩余宽度。
 
-#### ModalScrollRegion
+#### ScrollRegion
 
 单块 SimpleBar 滚动区，用于 Tab 面板或每一列。首列/末列背景由父级 `:first-child` / `:last-child` 选中。
 
 - `inset`（默认 `false`）：为 `true` 时内容区增加 `16px 20px` 内边距（适合详情、概览等单列内容）
 - 分栏列表左列通常保持 `inset={false}`，由列表项自行控制间距
 
-Tabs / 分栏弹窗须 **`bodyScroll={false}`**，此时 Modal 默认 **noPadding**（内容贴边），以便分栏铺满 body；需要外层留白时可传 **`noPadding={false}`**。
+Tabs / 分栏弹层须 **`bodyScroll={false}`**，此时默认 **noPadding**（内容贴边），以便分栏铺满 body；需要外层留白时可传 **`noPadding={false}`**。
 
 #### modalClassNames
 
 | 常量 | 值 | 用途 |
 |------|-----|------|
-| `stepsForm` | `react-modal-steps-form` | 分步弹窗挂 Modal `className`，去横向溢出 |
-| `splitter` | `react-modal-splitter` | antd Splitter 在 Modal 内的高度链 |
+| `stepsForm` | `react-modal-steps-form` | 分步弹窗挂 `className`，去横向溢出 |
+| `splitter` | `react-modal-splitter` | antd Splitter 在弹层内的高度链 |
 
 #### createModalRender
 
@@ -114,3 +147,38 @@ createModalRender(modalDefaults) => (hostProps) => Modal
 | 子内容自带 Footer | `{ footerButtons: [] }` |
 | 长内容 | `{ footerButtons: [], bodyScroll: true, size: 'large' }` |
 | 分步弹窗 | `{ footerButtons: [], bodyScroll: true, size: 'default', className: modalClassNames.stepsForm }` |
+
+### Drawer
+
+声明式侧滑层。基于 antd Drawer，关闭请使用 `onClose`（内部映射 antd `onClose`）。API 与 Modal 对齐处不再重复；差异如下。
+
+#### 属性（差异与补充）
+
+| 属性 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| placement | `left` \| `right` \| `top` \| `bottom` | `right` | 滑出方向；`size` 映射 width（left/right）或 height（top/bottom） |
+| size | `small` \| `default` \| `large` | `default` | 600 / 1000 / min(vw−64, 1500) px |
+| 移动端 | - | 侧滑全宽 | left/right → 100vw；top/bottom → 100vh（非 Modal 式全屏居中） |
+
+其余 `open` / `onClose` / `title` / `children` / `footer` / `footerButtons` / `bodyScroll` / `noPadding` / `closable` / `maskClosable` / `getContainer` 等与 Modal 相同。
+
+**FormModal**：传入的 `modalRender` 会在 Drawer 内注入 `ModalForm`，包裹整块 chrome（title / body / footer，与 Modal 的 panel 语义一致）；footer 内 Submit/Cancel 需在 Form 上下文内。
+
+嵌套时默认挂到外层 `.ant-drawer-root` 外侧。
+
+### useDrawer
+
+命令式打开 Drawer，参数同 Drawer。须在 antd `App` 内挂载 **`<DrawerContextHolder />`**（对标 antd 内置 `ModalContextHolder`），签名与 `useModal` 相同：`const drawer = useDrawer(); drawer(props) → { close }`。
+
+### Drawer CSS 变量
+
+挂在 `.drawer` / `.drawer-outer` 上；命名 `--kne-drawer-*`，语义与 Modal 对齐（无 viewport gutter，body 占满面板高度链）。`.drawer-outer` 内 bridge `--kne-modal-content-height` 等，供共用 `ScrollRegion` / `TabsLayout` 高度链。
+
+### createDrawerRender
+
+```ts
+createDrawerRender(drawerDefaults) => (hostProps) => Drawer
+```
+
+单参数合并渲染；宿主字段映射由 `renderModal` 回调内完成（同 `createModalRender`）。
+

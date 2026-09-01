@@ -1,14 +1,19 @@
-const { useModal } = _ReactModal;
-const { Button, Space, message, App, Descriptions, Tag, Typography } = antd;
+const { useModal, useDrawer, DrawerContextHolder } = _ReactModal;
+const { Button, Space, message, Descriptions, Tag, Typography, Radio, App } = antd;
+const { useState } = React;
 
 const { Text, Paragraph } = Typography;
 
 const CommandExample = () => {
   const modal = useModal();
+  const drawer = useDrawer();
+  const [mode, setMode] = useState('modal');
+  const isDrawer = mode === 'drawer';
 
   const openDetail = () => {
-    modal({
-      title: '候选人快览',
+    const api = isDrawer ? drawer : modal;
+    api({
+      title: isDrawer ? '候选人快览（侧滑）' : '候选人快览',
       size: 'small',
       confirmText: '加入待评估',
       children: ({ close }) => (
@@ -22,8 +27,8 @@ const CommandExample = () => {
             </Descriptions.Item>
           </Descriptions>
           <Paragraph type="secondary" style={{ marginBottom: 12 }}>
-            命令式弹窗适用于列表页「快速查看」场景；children 为函数时可调用 <Text code>close()</Text>{' '}
-            主动关闭。
+            命令式 {isDrawer ? 'Drawer' : 'Modal'} 适用于列表页「快速查看」；children 为函数时可调用{' '}
+            <Text code>close()</Text> 主动关闭。
           </Paragraph>
           <Button size="small" onClick={() => close()}>
             关闭
@@ -38,18 +43,32 @@ const CommandExample = () => {
 
   return (
     <Space direction="vertical">
+      <Space align="center" wrap>
+        <Text type="secondary">打开方式</Text>
+        <Radio.Group
+          value={mode}
+          optionType="button"
+          size="small"
+          options={[
+            { label: 'Modal', value: 'modal' },
+            { label: 'Drawer', value: 'drawer' }
+          ]}
+          onChange={e => setMode(e.target.value)}
+        />
+      </Space>
       <Button type="primary" onClick={openDetail}>
         从列表打开候选人快览
       </Button>
-      <Text type="secondary">需在 antd App 上下文中使用 useModal。</Text>
+      <Text type="secondary">
+        Drawer 模式需挂载 DrawerContextHolder；Modal 使用 antd App 内置 useModal。
+      </Text>
     </Space>
   );
 };
 
-const BaseExample = () => (
+render(
   <App>
+    <DrawerContextHolder />
     <CommandExample />
   </App>
 );
-
-render(<BaseExample />);
