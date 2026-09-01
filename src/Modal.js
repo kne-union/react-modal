@@ -45,7 +45,7 @@ const findParentModalMountHost = node => {
   return parentRoot.parentElement || (typeof document !== 'undefined' ? document.body : null);
 };
 
-const resolveModalGetContainer = ({ customGetContainer, getPopupContainer, getHostNode }) => {
+export const resolveModalGetContainer = ({ customGetContainer, getPopupContainer, getHostNode }) => {
   const wrappedCustom = wrapCustomGetContainer(customGetContainer);
   return triggerNode => {
     if (wrappedCustom) {
@@ -66,7 +66,7 @@ const resolveModalGetContainer = ({ customGetContainer, getPopupContainer, getHo
 let parentScrollLockCount = 0;
 let parentScrollLocked = [];
 
-const lockParentScroll = getScrollElement => {
+export const lockParentScroll = getScrollElement => {
   parentScrollLockCount += 1;
   if (parentScrollLockCount === 1) {
     const targets = [document.body];

@@ -1,8 +1,10 @@
 const {
   default: Modal,
-  ModalTabsLayout,
-  ModalColumnsLayout,
-  ModalScrollRegion,
+  Drawer,
+  DrawerContextHolder,
+  TabsLayout,
+  ColumnsLayout,
+  ScrollRegion,
   modalClassNames
 } = _ReactModal;
 const {
@@ -17,9 +19,10 @@ const {
   Typography,
   Divider,
   App,
-  message
+  message,
+  Radio
 } = antd;
-const { useState, useMemo } = React;
+const { useState, useMemo, useEffect } = React;
 
 const { Text, Title, Paragraph } = Typography;
 
@@ -303,8 +306,8 @@ const ColumnsPane = () => {
   const { setActive, search, setSearch, filtered, current } = useCandidatePanel();
 
   return (
-    <ModalColumnsLayout widths={['34%', '1fr']}>
-      <ModalScrollRegion>
+    <ColumnsLayout widths={['34%', '1fr']}>
+      <ScrollRegion>
         <CandidateList
           items={filtered}
           activeKey={current?.key}
@@ -312,11 +315,11 @@ const ColumnsPane = () => {
           search={search}
           onSearchChange={setSearch}
         />
-      </ModalScrollRegion>
-      <ModalScrollRegion inset>
+      </ScrollRegion>
+      <ScrollRegion inset>
         <CandidateDetail candidate={current} />
-      </ModalScrollRegion>
-    </ModalColumnsLayout>
+      </ScrollRegion>
+    </ColumnsLayout>
   );
 };
 
@@ -334,7 +337,7 @@ const SplitterPane = () => {
         max="52%"
       >
         <Splitter.Panel>
-          <ModalScrollRegion>
+          <ScrollRegion>
             <CandidateList
               items={filtered}
               activeKey={current?.key}
@@ -342,12 +345,12 @@ const SplitterPane = () => {
               search={search}
               onSearchChange={setSearch}
             />
-          </ModalScrollRegion>
+          </ScrollRegion>
         </Splitter.Panel>
         <Splitter.Panel>
-          <ModalScrollRegion inset>
+          <ScrollRegion inset>
             <CandidateDetail candidate={current} />
-          </ModalScrollRegion>
+          </ScrollRegion>
         </Splitter.Panel>
       </Splitter>
     </div>
@@ -371,7 +374,7 @@ const OverviewPane = () => {
   ];
 
   return (
-    <ModalScrollRegion>
+    <ScrollRegion>
       <div className="candidate-overview-stats">
         {[
           { label: '本批人数', value: stats.total },
@@ -413,7 +416,7 @@ const OverviewPane = () => {
         })}
         <Divider />
         <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-          概览 Tab 同样使用 ModalScrollRegion：批次统计与日程较长时在本面板内滚动，不影响 Tabs 顶栏与底部操作区。
+          概览 Tab 同样使用 ScrollRegion：批次统计与日程较长时在本面板内滚动，不影响 Tabs 顶栏与底部操作区。
         </Paragraph>
         {Array.from({ length: 6 }, (_, i) => (
           <Paragraph key={i} style={{ marginBottom: 8, color: 'rgba(0,0,0,0.45)' }}>
@@ -421,25 +424,60 @@ const OverviewPane = () => {
           </Paragraph>
         ))}
       </div>
-    </ModalScrollRegion>
+    </ScrollRegion>
   );
 };
 
 const ExtendLayoutExample = () => {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState('columns');
+  const [mode, setMode] = useState('modal');
+  const isDrawer = mode === 'drawer';
+
+  useEffect(() => {
+    if (open) {
+      setOpen(false);
+    }
+  }, [mode]);
+
+  const Overlay = isDrawer ? Drawer : Modal;
+
+  const layout = (
+    <TabsLayout
+      activeKey={tab}
+      onChange={setTab}
+      items={[
+        { key: 'columns', label: '候选人', children: <ColumnsPane /> },
+        { key: 'split', label: '可调分栏', children: <SplitterPane /> },
+        { key: 'overview', label: '批次概览', children: <OverviewPane /> }
+      ]}
+    />
+  );
 
   return (
     <Space direction="vertical" style={{ width: '100%' }} size="middle">
+      <Space align="center" wrap>
+        <Text type="secondary">打开方式</Text>
+        <Radio.Group
+          value={mode}
+          optionType="button"
+          size="small"
+          options={[
+            { label: 'Modal', value: 'modal' },
+            { label: 'Drawer', value: 'drawer' }
+          ]}
+          onChange={e => setMode(e.target.value)}
+        />
+      </Space>
       <div>
         <Button type="primary" onClick={() => setOpen(true)}>
-          打开批量评估弹窗
+          打开批量评估弹层
         </Button>
         <Paragraph type="secondary" style={{ margin: '8px 0 0' }}>
-          模拟 HR 批量面试评估：Tabs 占 title 位，左列表右详情，支持固定分栏 / 可调 Splitter / 批次概览。
+          模拟 HR 批量面试评估：Tabs 占 title 位，左列表右详情；切换 Modal / Drawer 对比布局高度链。
         </Paragraph>
       </div>
-      <Modal
+      <Overlay
         open={open}
         onClose={() => setOpen(false)}
         bodyScroll={false}
@@ -451,24 +489,15 @@ const ExtendLayoutExample = () => {
         confirmText="保存本批评估"
         cancelText="稍后处理"
       >
-        <ModalTabsLayout
-          activeKey={tab}
-          onChange={setTab}
-          items={[
-            { key: 'columns', label: '候选人', children: <ColumnsPane /> },
-            { key: 'split', label: '可调分栏', children: <SplitterPane /> },
-            { key: 'overview', label: '批次概览', children: <OverviewPane /> }
-          ]}
-        />
-      </Modal>
+        {layout}
+      </Overlay>
     </Space>
   );
 };
 
-const BaseExample = () => (
+render(
   <App>
+    <DrawerContextHolder />
     <ExtendLayoutExample />
   </App>
 );
-
-render(<BaseExample />);

@@ -9,7 +9,7 @@ const resolveColStyle = width => {
   return { flex: 'none', width, minWidth: 0 };
 };
 
-const ModalColumnsLayout = ({ widths, className, children, ...props }) => {
+const ColumnsLayout = ({ widths, className, children, ...props }) => {
   const cols = Children.toArray(children);
 
   return (
@@ -23,4 +23,4 @@ const ModalColumnsLayout = ({ widths, className, children, ...props }) => {
   );
 };
 
-export default ModalColumnsLayout;
+export default ColumnsLayout;

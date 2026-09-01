@@ -27,7 +27,7 @@ npm i --save @kne/react-modal
 - title / footer 固定在滚动外，body 默认 SimpleBar
 - `--kne-modal-*` / `--kne-drawer-*` CSS 变量管理高度链
 - Modal 移动端全屏；Drawer 移动端侧滑全宽
-- **示例**：各场景示例顶部提供 **Modal / Drawer** 切换，同一套 props 与内容对比两种弹层
+- **示例**：各场景示例顶部提供 **Modal / Drawer** 切换，同一套 props 与内容对比两种弹层（`doc/overlay-mode.js`）
 - **共用布局**：`TabsLayout`、`ColumnsLayout`、`ScrollRegion`；`createModalRender` / `createDrawerRender` 对接 renderModal 宿主
 
 #### 使用场景
@@ -228,25 +228,21 @@ npm i --save @kne/react-modal
 
 - 基础弹层
 - Modal / Drawer 切换：受控打开与异步 onConfirm（loading / 成功提示）
-- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),antd(antd)
+- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],_OverlayDemo(@kne/current-lib_react-modal/doc/overlay-mode.js)[import * as _OverlayDemo from "@kne/react-modal/doc/overlay-mode.js"],(@kne/current-lib_react-modal/dist/index.css),antd(antd)
 
 ```jsx
-const { default: Modal, Drawer, DrawerContextHolder } = _ReactModal;
-const { Button, Space, message, Typography, Radio, App } = antd;
-const { useState, useEffect } = React;
+const { default: Modal, Drawer } = _ReactModal;
+const { useOverlayMode, OverlayModeSwitch, useCloseOnOverlayModeChange, createDemoApp } = _OverlayDemo;
+const DemoApp = createDemoApp(_ReactModal);
+const { Button, Space, message, Typography } = antd;
+const { useState } = React;
 
 const { Text, Paragraph } = Typography;
 
 const BasicExample = () => {
   const [open, setOpen] = useState(false);
-  const [mode, setMode] = useState('modal');
-  const isDrawer = mode === 'drawer';
-
-  useEffect(() => {
-    if (open) {
-      setOpen(false);
-    }
-  }, [mode]);
+  const { mode, setOverlayMode, isDrawer } = useOverlayMode();
+  useCloseOnOverlayModeChange(open, setOpen, mode);
 
   const overlayProps = {
     title: '保存评估备注',
@@ -272,19 +268,7 @@ const BasicExample = () => {
 
   return (
     <Space direction="vertical" style={{ width: '100%' }} size="middle">
-      <Space align="center" wrap>
-        <Text type="secondary">打开方式</Text>
-        <Radio.Group
-          value={mode}
-          optionType="button"
-          size="small"
-          options={[
-            { label: 'Modal', value: 'modal' },
-            { label: 'Drawer', value: 'drawer' }
-          ]}
-          onChange={e => setMode(e.target.value)}
-        />
-      </Space>
+      <OverlayModeSwitch mode={mode} onChange={setOverlayMode} />
       <Button type="primary" onClick={() => setOpen(true)}>
         保存评估备注
       </Button>
@@ -303,22 +287,23 @@ const BasicExample = () => {
 };
 
 render(
-  <App>
-    <DrawerContextHolder />
+  <DemoApp>
     <BasicExample />
-  </App>
+  </DemoApp>
 );
 
 ```
 
 - footerButtons 与尺寸
 - Modal / Drawer 切换：size / footerButtons / 左侧 footer 插槽 / noPadding 预览
-- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),(@kne/current-lib_react-modal/doc/style.scss),antd(antd)
+- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],_OverlayDemo(@kne/current-lib_react-modal/doc/overlay-mode.js)[import * as _OverlayDemo from "@kne/react-modal/doc/overlay-mode.js"],(@kne/current-lib_react-modal/dist/index.css),(@kne/current-lib_react-modal/doc/style.scss),antd(antd)
 
 ```jsx
-const { default: Modal, Drawer, DrawerContextHolder } = _ReactModal;
-const { Button, Space, Radio, Tag, message, Typography, App } = antd;
-const { useState, useEffect } = React;
+const { default: Modal, Drawer } = _ReactModal;
+const { useOverlayMode, OverlayModeSwitch, useCloseOnOverlayModeChange, createDemoApp } = _OverlayDemo;
+const DemoApp = createDemoApp(_ReactModal);
+const { Button, Space, Radio, Tag, message, Typography } = antd;
+const { useState } = React;
 
 const { Text, Title, Paragraph } = Typography;
 
@@ -326,14 +311,8 @@ const FooterButtonsExample = () => {
   const [open, setOpen] = useState(false);
   const [size, setSize] = useState('default');
   const [noPadding, setNoPadding] = useState(false);
-  const [mode, setMode] = useState('modal');
-  const isDrawer = mode === 'drawer';
-
-  useEffect(() => {
-    if (open) {
-      setOpen(false);
-    }
-  }, [mode]);
+  const { mode, setOverlayMode, isDrawer } = useOverlayMode();
+  useCloseOnOverlayModeChange(open, setOpen, mode);
 
   const overlayProps = {
     title: '确认发布岗位',
@@ -390,19 +369,7 @@ const FooterButtonsExample = () => {
 
   return (
     <Space direction="vertical" style={{ width: '100%' }} size="large">
-      <Space align="center" wrap>
-        <Text type="secondary">打开方式</Text>
-        <Radio.Group
-          value={mode}
-          optionType="button"
-          size="small"
-          options={[
-            { label: 'Modal', value: 'modal' },
-            { label: 'Drawer', value: 'drawer' }
-          ]}
-          onChange={e => setMode(e.target.value)}
-        />
-      </Space>
+      <OverlayModeSwitch mode={mode} onChange={setOverlayMode} />
       <div>
         <Text type="secondary">切换 Modal / Drawer、尺寸与 noPadding，观察预览卡片与 footer 按钮区布局。</Text>
       </div>
@@ -434,30 +401,29 @@ const FooterButtonsExample = () => {
 };
 
 render(
-  <App>
-    <DrawerContextHolder />
+  <DemoApp>
     <FooterButtonsExample />
-  </App>
+  </DemoApp>
 );
 
 ```
 
 - 命令式打开（useModal / useDrawer）
 - 切换 Modal / Drawer：命令式快览，children 函数内可 close()
-- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),antd(antd)
+- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],_OverlayDemo(@kne/current-lib_react-modal/doc/overlay-mode.js)[import * as _OverlayDemo from "@kne/react-modal/doc/overlay-mode.js"],(@kne/current-lib_react-modal/dist/index.css),antd(antd)
 
 ```jsx
-const { useModal, useDrawer, DrawerContextHolder } = _ReactModal;
-const { Button, Space, message, Descriptions, Tag, Typography, Radio, App } = antd;
-const { useState } = React;
+const { useModal, useDrawer } = _ReactModal;
+const { useOverlayMode, OverlayModeSwitch, createDemoApp } = _OverlayDemo;
+const DemoApp = createDemoApp(_ReactModal);
+const { Button, Space, message, Descriptions, Tag, Typography } = antd;
 
 const { Text, Paragraph } = Typography;
 
 const CommandExample = () => {
   const modal = useModal();
   const drawer = useDrawer();
-  const [mode, setMode] = useState('modal');
-  const isDrawer = mode === 'drawer';
+  const { mode, setOverlayMode, isDrawer } = useOverlayMode();
 
   const openDetail = () => {
     const api = isDrawer ? drawer : modal;
@@ -492,34 +458,21 @@ const CommandExample = () => {
 
   return (
     <Space direction="vertical">
-      <Space align="center" wrap>
-        <Text type="secondary">打开方式</Text>
-        <Radio.Group
-          value={mode}
-          optionType="button"
-          size="small"
-          options={[
-            { label: 'Modal', value: 'modal' },
-            { label: 'Drawer', value: 'drawer' }
-          ]}
-          onChange={e => setMode(e.target.value)}
-        />
-      </Space>
+      <OverlayModeSwitch mode={mode} onChange={setOverlayMode} />
       <Button type="primary" onClick={openDetail}>
         从列表打开候选人快览
       </Button>
       <Text type="secondary">
-        Drawer 模式需挂载 DrawerContextHolder；Modal 使用 antd App 内置 useModal。
+        Drawer 模式需挂载 DrawerContextHolder（DemoApp 已包含）；Modal 使用 antd App 内置 useModal。
       </Text>
     </Space>
   );
 };
 
 render(
-  <App>
-    <DrawerContextHolder />
+  <DemoApp>
     <CommandExample />
-  </App>
+  </DemoApp>
 );
 
 ```
@@ -631,12 +584,14 @@ render(<BaseExample />);
 
 - 长内容滚动
 - Modal / Drawer 切换：SimpleBar vs bodyScroll=false 自管滚动
-- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),antd(antd)
+- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],_OverlayDemo(@kne/current-lib_react-modal/doc/overlay-mode.js)[import * as _OverlayDemo from "@kne/react-modal/doc/overlay-mode.js"],(@kne/current-lib_react-modal/dist/index.css),antd(antd)
 
 ```jsx
-const { default: Modal, Drawer, DrawerContextHolder } = _ReactModal;
-const { Button, Space, Typography, Divider, Radio, App } = antd;
-const { useState, useEffect } = React;
+const { default: Modal, Drawer } = _ReactModal;
+const { useOverlayMode, OverlayModeSwitch, useCloseOnOverlayModeChange, getOverlayChrome, createDemoApp } = _OverlayDemo;
+const DemoApp = createDemoApp(_ReactModal);
+const { Button, Space, Typography, Divider } = antd;
+const { useState } = React;
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -695,36 +650,15 @@ const EvaluationContent = () => (
 const LongContentExample = () => {
   const [open, setOpen] = useState(false);
   const [openSelfScroll, setOpenSelfScroll] = useState(false);
-  const [mode, setMode] = useState('modal');
-  const isDrawer = mode === 'drawer';
-
-  useEffect(() => {
-    if (open) {
-      setOpen(false);
-    }
-    if (openSelfScroll) {
-      setOpenSelfScroll(false);
-    }
-  }, [mode]);
-
-  const contentHeightVar = isDrawer ? '--kne-drawer-content-height' : '--kne-modal-content-height';
+  const { mode, setOverlayMode, isDrawer } = useOverlayMode();
+  useCloseOnOverlayModeChange(open, setOpen, mode);
+  useCloseOnOverlayModeChange(openSelfScroll, setOpenSelfScroll, mode);
+  const chrome = getOverlayChrome(mode);
   const Overlay = isDrawer ? Drawer : Modal;
 
   return (
     <Space direction="vertical" style={{ width: '100%' }} size="middle">
-      <Space align="center" wrap>
-        <Text type="secondary">打开方式</Text>
-        <Radio.Group
-          value={mode}
-          optionType="button"
-          size="small"
-          options={[
-            { label: 'Modal', value: 'modal' },
-            { label: 'Drawer', value: 'drawer' }
-          ]}
-          onChange={e => setMode(e.target.value)}
-        />
-      </Space>
+      <OverlayModeSwitch mode={mode} onChange={setOverlayMode} />
       <Paragraph type="secondary" style={{ margin: 0 }}>
         对比默认 SimpleBar 与 bodyScroll=false 自管滚动；切换 Modal / Drawer 观察高度链一致。
       </Paragraph>
@@ -754,7 +688,7 @@ const LongContentExample = () => {
       >
         <div
           style={{
-            height: &#96;var(${contentHeightVar})&#96;,
+            height: &#96;var(${chrome.contentHeightVar})&#96;,
             minHeight: 0,
             overflow: 'auto',
             boxSizing: 'border-box',
@@ -763,7 +697,7 @@ const LongContentExample = () => {
         >
           <div style={{ padding: 20 }}>
             <Paragraph style={{ marginTop: 0 }}>
-              内容区高度绑定 <Text code>{contentHeightVar}</Text>，Tabs / 分栏场景同样适用。
+              内容区高度绑定 <Text code>{chrome.contentHeightVar}</Text>，Tabs / 分栏场景同样适用。
             </Paragraph>
             <EvaluationContent />
           </div>
@@ -774,43 +708,35 @@ const LongContentExample = () => {
 };
 
 render(
-  <App>
-    <DrawerContextHolder />
+  <DemoApp>
     <LongContentExample />
-  </App>
+  </DemoApp>
 );
 
 ```
 
 - 高度 CSS 变量
 - Modal / Drawer 切换：默认/自定义 CSS 变量；色块绑定 content-height，探针显示变量与 clientHeight
-- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),antd(antd)
+- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],_OverlayDemo(@kne/current-lib_react-modal/doc/overlay-mode.js)[import * as _OverlayDemo from "@kne/react-modal/doc/overlay-mode.js"],(@kne/current-lib_react-modal/dist/index.css),antd(antd)
 
 ```jsx
-const { default: Modal, Drawer, DrawerContextHolder } = _ReactModal;
-const { Button, Space, Switch, Tag, Descriptions, Radio, Typography, App } = antd;
+const { default: Modal, Drawer } = _ReactModal;
+const {
+  useOverlayMode,
+  OverlayModeSwitch,
+  useCloseOnOverlayModeChange,
+  getOverlayChrome,
+  createDemoApp
+} = _OverlayDemo;
+const DemoApp = createDemoApp(_ReactModal);
+const { Button, Space, Switch, Tag, Descriptions } = antd;
 const { useState, useEffect } = React;
-
-const { Text } = Typography;
 
 const readCssVar = (el, name) => {
   if (!el) {
     return '-';
   }
   return getComputedStyle(el).getPropertyValue(name).trim() || '-';
-};
-
-const getOverlayChrome = mode => {
-  const isDrawer = mode === 'drawer';
-  return {
-    isDrawer,
-    testId: isDrawer ? 'react-drawer' : 'react-modal',
-    bodyClass: isDrawer ? 'drawer-body' : 'modal-body',
-    innerClass: isDrawer ? 'drawer-body-inner' : 'modal-body-inner',
-    contentHeightVar: isDrawer ? '--kne-drawer-content-height' : '--kne-modal-content-height',
-    bodyHeightVar: isDrawer ? '--kne-drawer-body-height' : '--kne-modal-body-height',
-    varPrefix: isDrawer ? '--kne-drawer' : '--kne-modal'
-  };
 };
 
 const HeightProbe = ({ open, revision, mode }) => {
@@ -862,15 +788,8 @@ const fillLines = Array.from({ length: 18 }, (_, i) => &#96;填充行 ${i + 1} �
 const HeightVarsExample = () => {
   const [open, setOpen] = useState(false);
   const [customVars, setCustomVars] = useState(true);
-  const [mode, setMode] = useState('modal');
-  const isDrawer = mode === 'drawer';
-
-  useEffect(() => {
-    if (open) {
-      setOpen(false);
-    }
-  }, [mode]);
-
+  const { mode, setOverlayMode, isDrawer } = useOverlayMode();
+  useCloseOnOverlayModeChange(open, setOpen, mode);
   const chrome = getOverlayChrome(mode);
   const revision = &#96;${mode}|${customVars}|${open}&#96;;
   const Overlay = isDrawer ? Drawer : Modal;
@@ -890,19 +809,7 @@ const HeightVarsExample = () => {
 
   return (
     <Space direction="vertical" style={{ width: '100%' }} size="middle">
-      <Space align="center" wrap>
-        <Text type="secondary">打开方式</Text>
-        <Radio.Group
-          value={mode}
-          optionType="button"
-          size="small"
-          options={[
-            { label: 'Modal', value: 'modal' },
-            { label: 'Drawer', value: 'drawer' }
-          ]}
-          onChange={e => setMode(e.target.value)}
-        />
-      </Space>
+      <OverlayModeSwitch mode={mode} onChange={setOverlayMode} />
       <Space wrap align="center">
         <Switch
           checked={customVars}
@@ -958,43 +865,35 @@ const HeightVarsExample = () => {
 };
 
 render(
-  <App>
-    <DrawerContextHolder />
+  <DemoApp>
     <HeightVarsExample />
-  </App>
+  </DemoApp>
 );
 
 ```
 
 - title / footer / noPadding 高度探针
 - Modal / Drawer 切换：title、footer、noPadding、bodyScroll 组合实测高度变量
-- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),antd(antd)
+- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],_OverlayDemo(@kne/current-lib_react-modal/doc/overlay-mode.js)[import * as _OverlayDemo from "@kne/react-modal/doc/overlay-mode.js"],(@kne/current-lib_react-modal/dist/index.css),antd(antd)
 
 ```jsx
-const { default: Modal, Drawer, DrawerContextHolder } = _ReactModal;
-const { Button, Space, Switch, Radio, Tag, Descriptions, Typography, App } = antd;
+const { default: Modal, Drawer } = _ReactModal;
+const {
+  useOverlayMode,
+  OverlayModeSwitch,
+  useCloseOnOverlayModeChange,
+  getOverlayChrome,
+  createDemoApp
+} = _OverlayDemo;
+const DemoApp = createDemoApp(_ReactModal);
+const { Button, Space, Switch, Radio, Tag, Descriptions } = antd;
 const { useState, useEffect } = React;
-
-const { Text } = Typography;
 
 const readCssVar = (el, name) => {
   if (!el) {
     return '-';
   }
   return getComputedStyle(el).getPropertyValue(name).trim() || '-';
-};
-
-const getOverlayChrome = mode => {
-  const isDrawer = mode === 'drawer';
-  return {
-    isDrawer,
-    testId: isDrawer ? 'react-drawer' : 'react-modal',
-    bodyClass: isDrawer ? 'drawer-body' : 'modal-body',
-    innerClass: isDrawer ? 'drawer-body-inner' : 'modal-body-inner',
-    contentHeightVar: isDrawer ? '--kne-drawer-content-height' : '--kne-modal-content-height',
-    bodyHeightVar: isDrawer ? '--kne-drawer-body-height' : '--kne-modal-body-height',
-    varPrefix: isDrawer ? '--kne-drawer' : '--kne-modal'
-  };
 };
 
 const HeightProbe = ({ open, revision, mode }) => {
@@ -1053,15 +952,8 @@ const ChromeHeightExample = () => {
   const [footerMode, setFooterMode] = useState('default');
   const [bodyScroll, setBodyScroll] = useState(false);
   const [noPaddingMode, setNoPaddingMode] = useState('auto');
-  const [mode, setMode] = useState('modal');
-  const isDrawer = mode === 'drawer';
-
-  useEffect(() => {
-    if (open) {
-      setOpen(false);
-    }
-  }, [mode]);
-
+  const { mode, setOverlayMode, isDrawer } = useOverlayMode();
+  useCloseOnOverlayModeChange(open, setOpen, mode);
   const chrome = getOverlayChrome(mode);
   const Overlay = isDrawer ? Drawer : Modal;
   const revision = [mode, hasTitle, footerMode, bodyScroll, noPaddingMode, open].join('|');
@@ -1090,19 +982,7 @@ const ChromeHeightExample = () => {
 
   return (
     <Space direction="vertical" style={{ width: '100%' }} size="middle">
-      <Space align="center" wrap>
-        <Text type="secondary">打开方式</Text>
-        <Radio.Group
-          value={mode}
-          optionType="button"
-          size="small"
-          options={[
-            { label: 'Modal', value: 'modal' },
-            { label: 'Drawer', value: 'drawer' }
-          ]}
-          onChange={e => setMode(e.target.value)}
-        />
-      </Space>
+      <OverlayModeSwitch mode={mode} onChange={setOverlayMode} />
       <Space wrap align="center">
         <span>title</span>
         <Switch checked={hasTitle} onChange={setHasTitle} checkedChildren="有" unCheckedChildren="空" />
@@ -1193,28 +1073,28 @@ const ChromeHeightExample = () => {
 };
 
 render(
-  <App>
-    <DrawerContextHolder />
+  <DemoApp>
     <ChromeHeightExample />
-  </App>
+  </DemoApp>
 );
 
 ```
 
 - 批量候选人评估（Tabs + 分栏）
 - Modal / Drawer 切换：Tabs 分栏 / Splitter / 批次概览
-- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),antd(antd),(@kne/current-lib_react-modal/doc/style.scss)
+- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],_OverlayDemo(@kne/current-lib_react-modal/doc/overlay-mode.js)[import * as _OverlayDemo from "@kne/react-modal/doc/overlay-mode.js"],(@kne/current-lib_react-modal/dist/index.css),antd(antd),(@kne/current-lib_react-modal/doc/style.scss)
 
 ```jsx
 const {
   default: Modal,
   Drawer,
-  DrawerContextHolder,
   TabsLayout,
   ColumnsLayout,
   ScrollRegion,
   modalClassNames
 } = _ReactModal;
+const { useOverlayMode, OverlayModeSwitch, useCloseOnOverlayModeChange, createDemoApp } = _OverlayDemo;
+const DemoApp = createDemoApp(_ReactModal);
 const {
   Button,
   Space,
@@ -1227,10 +1107,9 @@ const {
   Typography,
   Divider,
   App,
-  message,
-  Radio
+  message
 } = antd;
-const { useState, useMemo, useEffect } = React;
+const { useState, useMemo } = React;
 
 const { Text, Title, Paragraph } = Typography;
 
@@ -1639,15 +1518,8 @@ const OverviewPane = () => {
 const ExtendLayoutExample = () => {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState('columns');
-  const [mode, setMode] = useState('modal');
-  const isDrawer = mode === 'drawer';
-
-  useEffect(() => {
-    if (open) {
-      setOpen(false);
-    }
-  }, [mode]);
-
+  const { mode, setOverlayMode, isDrawer } = useOverlayMode();
+  useCloseOnOverlayModeChange(open, setOpen, mode);
   const Overlay = isDrawer ? Drawer : Modal;
 
   const layout = (
@@ -1664,19 +1536,7 @@ const ExtendLayoutExample = () => {
 
   return (
     <Space direction="vertical" style={{ width: '100%' }} size="middle">
-      <Space align="center" wrap>
-        <Text type="secondary">打开方式</Text>
-        <Radio.Group
-          value={mode}
-          optionType="button"
-          size="small"
-          options={[
-            { label: 'Modal', value: 'modal' },
-            { label: 'Drawer', value: 'drawer' }
-          ]}
-          onChange={e => setMode(e.target.value)}
-        />
-      </Space>
+      <OverlayModeSwitch mode={mode} onChange={setOverlayMode} />
       <div>
         <Button type="primary" onClick={() => setOpen(true)}>
           打开批量评估弹层
@@ -1703,22 +1563,25 @@ const ExtendLayoutExample = () => {
   );
 };
 
-render(
-  <App>
-    <DrawerContextHolder />
+const BaseExample = () => (
+  <DemoApp>
     <ExtendLayoutExample />
-  </App>
+  </DemoApp>
 );
+
+render(<BaseExample />);
 
 ```
 
 - 嵌套弹层（外层命令式 + 内层 Modal）
 - Modal / Drawer 切换外层；内层声明式 Modal 嵌套 hoist
-- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),antd(antd)
+- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],_OverlayDemo(@kne/current-lib_react-modal/doc/overlay-mode.js)[import * as _OverlayDemo from "@kne/react-modal/doc/overlay-mode.js"],(@kne/current-lib_react-modal/dist/index.css),antd(antd)
 
 ```jsx
-const { default: Modal, useModal, useDrawer, DrawerContextHolder } = _ReactModal;
-const { Button, Space, Typography, Tag, message, Checkbox, Radio, App } = antd;
+const { default: Modal, useModal, useDrawer } = _ReactModal;
+const { useOverlayMode, OverlayModeSwitch, createDemoApp } = _OverlayDemo;
+const DemoApp = createDemoApp(_ReactModal);
+const { Button, Space, Typography, Tag, message, Checkbox } = antd;
 const { useState, useEffect } = React;
 const { Text, Paragraph } = Typography;
 
@@ -1807,24 +1670,11 @@ const ExportFieldPicker = ({ isDrawer }) => {
 const NestedModalExample = () => {
   const modal = useModal();
   const drawer = useDrawer();
-  const [mode, setMode] = useState('modal');
-  const isDrawer = mode === 'drawer';
+  const { mode, setOverlayMode, isDrawer } = useOverlayMode();
 
   return (
     <Space direction="vertical" style={{ width: '100%' }} size="middle">
-      <Space align="center" wrap>
-        <Text type="secondary">打开方式</Text>
-        <Radio.Group
-          value={mode}
-          optionType="button"
-          size="small"
-          options={[
-            { label: 'Modal', value: 'modal' },
-            { label: 'Drawer', value: 'drawer' }
-          ]}
-          onChange={e => setMode(e.target.value)}
-        />
-      </Space>
+      <OverlayModeSwitch mode={mode} onChange={setOverlayMode} />
       <Button
         type="primary"
         onClick={() => {
@@ -1846,23 +1696,30 @@ const NestedModalExample = () => {
 };
 
 render(
-  <App>
-    <DrawerContextHolder />
+  <DemoApp>
     <NestedModalExample />
-  </App>
+  </DemoApp>
 );
 
 ```
 
 - FormModal + renderModal
 - Modal / Drawer 切换：超长表单，createModalRender / createDrawerRender
-- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),_FormInfo(@kne/form-info)[import * as _FormInfo from "@kne/form-info"],(@kne/form-info/dist/index.css),antd(antd)
+- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],_OverlayDemo(@kne/current-lib_react-modal/doc/overlay-mode.js)[import * as _OverlayDemo from "@kne/react-modal/doc/overlay-mode.js"],(@kne/current-lib_react-modal/dist/index.css),_FormInfo(@kne/form-info)[import * as _FormInfo from "@kne/form-info"],(@kne/form-info/dist/index.css),antd(antd)
 
 ```jsx
-const { createModalRender, createDrawerRender, DrawerContextHolder } = _ReactModal;
+const { createModalRender, createDrawerRender } = _ReactModal;
+const {
+  useOverlayMode,
+  OverlayModeSwitch,
+  useCloseOnOverlayModeChange,
+  createOverlayRender,
+  createDemoApp
+} = _OverlayDemo;
+const DemoApp = createDemoApp(_ReactModal);
 const { default: FormInfo, FormModal, Input, TextArea } = _FormInfo;
-const { Button, Space, Typography, App, message, Switch, Flex, Radio } = antd;
-const { useState, useMemo, useEffect } = React;
+const { Button, Space, Typography, App, message, Switch, Flex } = antd;
+const { useState, useMemo } = React;
 const { Text, Paragraph } = Typography;
 
 const SECTION_DEFS = [
@@ -1984,19 +1841,15 @@ const LongFormFields = () => (
 const FormInfoModalExample = () => {
   const [open, setOpen] = useState(false);
   const [bodyScroll, setBodyScroll] = useState(true);
-  const [mode, setMode] = useState('modal');
-  const isDrawer = mode === 'drawer';
+  const { mode, setOverlayMode, isDrawer } = useOverlayMode();
+  useCloseOnOverlayModeChange(open, setOpen, mode);
   const initialData = useMemo(() => buildInitialData(), []);
 
-  useEffect(() => {
-    if (open) {
-      setOpen(false);
-    }
-  }, [mode]);
-
-  const renderModalBase = isDrawer
-    ? createDrawerRender({ placement: 'right', footerButtons: [], bodyScroll: true, size: 'large' })
-    : createModalRender({ footerButtons: [], bodyScroll: true, size: 'large' });
+  const renderModalBase = createOverlayRender(isDrawer, { createModalRender, createDrawerRender }, {
+    footerButtons: [],
+    bodyScroll: true,
+    size: 'large'
+  });
 
   const renderModal = ({
     formProps,
@@ -2019,19 +1872,7 @@ const FormInfoModalExample = () => {
 
   return (
     <Space direction="vertical" style={{ width: '100%' }}>
-      <Space align="center" wrap>
-        <Text type="secondary">打开方式</Text>
-        <Radio.Group
-          value={mode}
-          optionType="button"
-          size="small"
-          options={[
-            { label: 'Modal', value: 'modal' },
-            { label: 'Drawer', value: 'drawer' }
-          ]}
-          onChange={e => setMode(e.target.value)}
-        />
-      </Space>
+      <OverlayModeSwitch mode={mode} onChange={setOverlayMode} />
       <Space wrap>
         <Button type="primary" onClick={() => setOpen(true)}>
           打开深度评估表单（FormModal）
@@ -2067,41 +1908,46 @@ const FormInfoModalExample = () => {
   );
 };
 
-render(
-  <App>
-    <DrawerContextHolder />
+const BaseExample = () => (
+  <DemoApp>
     <FormInfoModalExample />
-  </App>
+  </DemoApp>
 );
+
+render(<BaseExample />);
 
 ```
 
 - FormStepsModal + renderModal
 - Modal / Drawer 切换：分步表单，步骤内 FormInfo gap + Flex 垂直间距
-- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),_FormInfo(@kne/form-info)[import * as _FormInfo from "@kne/form-info"],(@kne/form-info/dist/index.css),antd(antd)
+- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],_OverlayDemo(@kne/current-lib_react-modal/doc/overlay-mode.js)[import * as _OverlayDemo from "@kne/react-modal/doc/overlay-mode.js"],(@kne/current-lib_react-modal/dist/index.css),_FormInfo(@kne/form-info)[import * as _FormInfo from "@kne/form-info"],(@kne/form-info/dist/index.css),antd(antd)
 
 ```jsx
-const { createModalRender, createDrawerRender, modalClassNames, DrawerContextHolder } = _ReactModal;
+const { createModalRender, createDrawerRender, modalClassNames } = _ReactModal;
+const {
+  useOverlayMode,
+  OverlayModeSwitch,
+  useCloseOnOverlayModeChange,
+  createOverlayRender,
+  createDemoApp
+} = _OverlayDemo;
+const DemoApp = createDemoApp(_ReactModal);
 const { default: FormInfo, FormStepsModal, List, Input, TextArea } = _FormInfo;
-const { Button, Space, Typography, App, message, Flex, Radio } = antd;
-const { useState, useEffect } = React;
+const { Button, Space, Typography, App, message, Flex } = antd;
+const { useState } = React;
 const { Text } = Typography;
 
-const renderStepsModalBase = isDrawer =>
-  isDrawer
-    ? createDrawerRender({
-        placement: 'right',
-        footerButtons: [],
-        bodyScroll: true,
-        size: 'default',
-        className: modalClassNames.stepsForm
-      })
-    : createModalRender({
-        footerButtons: [],
-        bodyScroll: true,
-        size: 'default',
-        className: modalClassNames.stepsForm
-      });
+const renderStepsModalBase = (isDrawer) =>
+  createOverlayRender(
+    isDrawer,
+    { createModalRender, createDrawerRender },
+    {
+      footerButtons: [],
+      bodyScroll: true,
+      size: 'default',
+      className: modalClassNames.stepsForm
+    }
+  );
 
 const renderStepsModal = isDrawer => ({
   formProps,
@@ -2148,30 +1994,12 @@ const STEP_DATA = {
 
 const FormInfoStepsModalExample = () => {
   const [open, setOpen] = useState(false);
-  const [mode, setMode] = useState('modal');
-  const isDrawer = mode === 'drawer';
-
-  useEffect(() => {
-    if (open) {
-      setOpen(false);
-    }
-  }, [mode]);
+  const { mode, setOverlayMode, isDrawer } = useOverlayMode();
+  useCloseOnOverlayModeChange(open, setOpen, mode);
 
   return (
     <Space direction="vertical" style={{ width: '100%' }}>
-      <Space align="center" wrap>
-        <Text type="secondary">打开方式</Text>
-        <Radio.Group
-          value={mode}
-          optionType="button"
-          size="small"
-          options={[
-            { label: 'Modal', value: 'modal' },
-            { label: 'Drawer', value: 'drawer' }
-          ]}
-          onChange={e => setMode(e.target.value)}
-        />
-      </Space>
+      <OverlayModeSwitch mode={mode} onChange={setOverlayMode} />
       <Button type="primary" onClick={() => setOpen(true)}>
         打开分步评估（FormStepsModal）
       </Button>
@@ -2282,12 +2110,13 @@ const FormInfoStepsModalExample = () => {
   );
 };
 
-render(
-  <App>
-    <DrawerContextHolder />
+const BaseExample = () => (
+  <DemoApp>
     <FormInfoStepsModalExample />
-  </App>
+  </DemoApp>
 );
+
+render(<BaseExample />);
 
 ```
 
@@ -2476,4 +2305,3 @@ createDrawerRender(drawerDefaults) => (hostProps) => Drawer
 ```
 
 单参数合并渲染；宿主字段映射由 `renderModal` 回调内完成（同 `createModalRender`）。
-

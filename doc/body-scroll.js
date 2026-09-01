@@ -1,6 +1,6 @@
-const { default: Modal } = _ReactModal;
-const { Button, Space, App, Typography, Divider } = antd;
-const { useState } = React;
+const { default: Modal, Drawer, DrawerContextHolder } = _ReactModal;
+const { Button, Space, Typography, Divider, Radio, App } = antd;
+const { useState, useEffect } = React;
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -59,11 +59,38 @@ const EvaluationContent = () => (
 const LongContentExample = () => {
   const [open, setOpen] = useState(false);
   const [openSelfScroll, setOpenSelfScroll] = useState(false);
+  const [mode, setMode] = useState('modal');
+  const isDrawer = mode === 'drawer';
+
+  useEffect(() => {
+    if (open) {
+      setOpen(false);
+    }
+    if (openSelfScroll) {
+      setOpenSelfScroll(false);
+    }
+  }, [mode]);
+
+  const contentHeightVar = isDrawer ? '--kne-drawer-content-height' : '--kne-modal-content-height';
+  const Overlay = isDrawer ? Drawer : Modal;
 
   return (
     <Space direction="vertical" style={{ width: '100%' }} size="middle">
+      <Space align="center" wrap>
+        <Text type="secondary">打开方式</Text>
+        <Radio.Group
+          value={mode}
+          optionType="button"
+          size="small"
+          options={[
+            { label: 'Modal', value: 'modal' },
+            { label: 'Drawer', value: 'drawer' }
+          ]}
+          onChange={e => setMode(e.target.value)}
+        />
+      </Space>
       <Paragraph type="secondary" style={{ margin: 0 }}>
-        对比默认 SimpleBar 与 bodyScroll=false 自管滚动两种长内容场景。
+        对比默认 SimpleBar 与 bodyScroll=false 自管滚动；切换 Modal / Drawer 观察高度链一致。
       </Paragraph>
       <Space wrap>
         <Button type="primary" onClick={() => setOpen(true)}>
@@ -71,25 +98,27 @@ const LongContentExample = () => {
         </Button>
         <Button onClick={() => setOpenSelfScroll(true)}>自管滚动（bodyScroll=false）</Button>
       </Space>
-      <Modal
+      <Overlay
         title="陈思远 · 面试评估纪要"
         open={open}
         onClose={() => setOpen(false)}
         onConfirm={() => {}}
         confirmText="保存纪要"
+        size={isDrawer ? 'default' : undefined}
       >
         <EvaluationContent />
-      </Modal>
-      <Modal
+      </Overlay>
+      <Overlay
         title="自管滚动示例"
         open={openSelfScroll}
         onClose={() => setOpenSelfScroll(false)}
         bodyScroll={false}
         footer={null}
+        size={isDrawer ? 'large' : undefined}
       >
         <div
           style={{
-            height: 'var(--kne-modal-content-height)',
+            height: `var(${contentHeightVar})`,
             minHeight: 0,
             overflow: 'auto',
             boxSizing: 'border-box',
@@ -98,20 +127,19 @@ const LongContentExample = () => {
         >
           <div style={{ padding: 20 }}>
             <Paragraph style={{ marginTop: 0 }}>
-              内容区高度绑定 <Text code>--kne-modal-content-height</Text>，在 Tabs / 分栏场景同样适用。
+              内容区高度绑定 <Text code>{contentHeightVar}</Text>，Tabs / 分栏场景同样适用。
             </Paragraph>
             <EvaluationContent />
           </div>
         </div>
-      </Modal>
+      </Overlay>
     </Space>
   );
 };
 
-const BaseExample = () => (
+render(
   <App>
+    <DrawerContextHolder />
     <LongContentExample />
   </App>
 );
-
-render(<BaseExample />);

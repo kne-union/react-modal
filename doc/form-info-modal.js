@@ -1,7 +1,7 @@
-const { createModalRender } = _ReactModal;
+const { createModalRender, createDrawerRender, DrawerContextHolder } = _ReactModal;
 const { default: FormInfo, FormModal, Input, TextArea } = _FormInfo;
-const { Button, Space, Typography, App, message, Switch, Flex } = antd;
-const { useState, useMemo } = React;
+const { Button, Space, Typography, App, message, Switch, Flex, Radio } = antd;
+const { useState, useMemo, useEffect } = React;
 const { Text, Paragraph } = Typography;
 
 const SECTION_DEFS = [
@@ -123,13 +123,19 @@ const LongFormFields = () => (
 const FormInfoModalExample = () => {
   const [open, setOpen] = useState(false);
   const [bodyScroll, setBodyScroll] = useState(true);
+  const [mode, setMode] = useState('modal');
+  const isDrawer = mode === 'drawer';
   const initialData = useMemo(() => buildInitialData(), []);
 
-  const renderModalBase = createModalRender({
-    footerButtons: [],
-    bodyScroll: true,
-    size: 'large'
-  });
+  useEffect(() => {
+    if (open) {
+      setOpen(false);
+    }
+  }, [mode]);
+
+  const renderModalBase = isDrawer
+    ? createDrawerRender({ placement: 'right', footerButtons: [], bodyScroll: true, size: 'large' })
+    : createModalRender({ footerButtons: [], bodyScroll: true, size: 'large' });
 
   const renderModal = ({
     formProps,
@@ -152,6 +158,19 @@ const FormInfoModalExample = () => {
 
   return (
     <Space direction="vertical" style={{ width: '100%' }}>
+      <Space align="center" wrap>
+        <Text type="secondary">打开方式</Text>
+        <Radio.Group
+          value={mode}
+          optionType="button"
+          size="small"
+          options={[
+            { label: 'Modal', value: 'modal' },
+            { label: 'Drawer', value: 'drawer' }
+          ]}
+          onChange={e => setMode(e.target.value)}
+        />
+      </Space>
       <Space wrap>
         <Button type="primary" onClick={() => setOpen(true)}>
           打开深度评估表单（FormModal）
@@ -162,11 +181,11 @@ const FormInfoModalExample = () => {
         </Space>
       </Space>
       <Text type="secondary">
-        createModalRender 注入 Modal 默认 props；form-info 宿主字段与 onCancel→onClose 在 renderModal 内映射。
+        createModalRender / createDrawerRender 注入默认 props；切换 Modal / Drawer 对比 form-info 宿主集成。
       </Text>
 
       <FormModal
-        title="候选人深度评估（超长表单）"
+        title={isDrawer ? '候选人深度评估（侧滑）' : '候选人深度评估（超长表单）'}
         open={open}
         onCancel={() => setOpen(false)}
         renderModal={renderModal}
@@ -187,10 +206,9 @@ const FormInfoModalExample = () => {
   );
 };
 
-const BaseExample = () => (
+render(
   <App>
+    <DrawerContextHolder />
     <FormInfoModalExample />
   </App>
 );
-
-render(<BaseExample />);

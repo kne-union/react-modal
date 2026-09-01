@@ -1,17 +1,26 @@
-const { createModalRender, modalClassNames } = _ReactModal;
+const { createModalRender, createDrawerRender, modalClassNames, DrawerContextHolder } = _ReactModal;
 const { default: FormInfo, FormStepsModal, List, Input, TextArea } = _FormInfo;
-const { Button, Space, Typography, App, message, Flex } = antd;
-const { useState } = React;
+const { Button, Space, Typography, App, message, Flex, Radio } = antd;
+const { useState, useEffect } = React;
 const { Text } = Typography;
 
-const renderStepsModalBase = createModalRender({
-  footerButtons: [],
-  bodyScroll: true,
-  size: 'default',
-  className: modalClassNames.stepsForm
-});
+const renderStepsModalBase = isDrawer =>
+  isDrawer
+    ? createDrawerRender({
+        placement: 'right',
+        footerButtons: [],
+        bodyScroll: true,
+        size: 'default',
+        className: modalClassNames.stepsForm
+      })
+    : createModalRender({
+        footerButtons: [],
+        bodyScroll: true,
+        size: 'default',
+        className: modalClassNames.stepsForm
+      });
 
-const renderStepsModal = ({
+const renderStepsModal = isDrawer => ({
   formProps,
   saveText,
   autoClose,
@@ -22,7 +31,7 @@ const renderStepsModal = ({
   className,
   ...props
 }) =>
-  renderStepsModalBase({
+  renderStepsModalBase(isDrawer)({
     ...props,
     className,
     onClose: onCancel,
@@ -56,15 +65,34 @@ const STEP_DATA = {
 
 const FormInfoStepsModalExample = () => {
   const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState('modal');
+  const isDrawer = mode === 'drawer';
+
+  useEffect(() => {
+    if (open) {
+      setOpen(false);
+    }
+  }, [mode]);
 
   return (
     <Space direction="vertical" style={{ width: '100%' }}>
+      <Space align="center" wrap>
+        <Text type="secondary">打开方式</Text>
+        <Radio.Group
+          value={mode}
+          optionType="button"
+          size="small"
+          options={[
+            { label: 'Modal', value: 'modal' },
+            { label: 'Drawer', value: 'drawer' }
+          ]}
+          onChange={e => setMode(e.target.value)}
+        />
+      </Space>
       <Button type="primary" onClick={() => setOpen(true)}>
         打开分步评估（FormStepsModal）
       </Button>
-      <Text type="secondary">
-        三步完成候选人评估：基本信息 → 维度评分 → 经历与结论。
-      </Text>
+      <Text type="secondary">三步完成候选人评估；切换 Modal / Drawer 对比分步表单高度链。</Text>
 
       <FormStepsModal
         autoStep
@@ -76,10 +104,10 @@ const FormInfoStepsModalExample = () => {
         }}
         modalProps={{
           open,
-          title: '候选人评估（分步）',
+          title: isDrawer ? '候选人评估（侧滑分步）' : '候选人评估（分步）',
           width: 900,
           onCancel: () => setOpen(false),
-          renderModal: renderStepsModal
+          renderModal: renderStepsModal(isDrawer)
         }}
         items={[
           {
@@ -171,10 +199,9 @@ const FormInfoStepsModalExample = () => {
   );
 };
 
-const BaseExample = () => (
+render(
   <App>
+    <DrawerContextHolder />
     <FormInfoStepsModalExample />
   </App>
 );
-
-render(<BaseExample />);
