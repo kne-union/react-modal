@@ -4,11 +4,11 @@
 
 ### 描述
 
-基于 antd 的 React 弹窗组件，提供 Modal/useModal、Tabs 分栏布局与 renderModal 适配，支持 SimpleBar 滚动与移动端全屏。
+基于 antd 的 React 弹层组件，提供 Modal/Drawer、useModal/useDrawer/useConfirmModal、共用 TabsLayout/ScrollRegion 布局与 createModalRender/createDrawerRender，支持 SimpleBar 与移动端适配。
 
 ### 关键词
 
-react, modal, antd, dialog, simplebar, use-modal, footer-buttons, tabs-layout, mobile, form, component, i18n
+react, modal, drawer, antd, dialog, simplebar, use-modal, use-drawer, use-confirm-modal, footer-buttons, tabs-layout, mobile, form, component, i18n
 
 ### 安装
 
@@ -20,20 +20,21 @@ npm i --save @kne/react-modal
 
 #### 概述
 
-`@kne/react-modal` 是基于 Ant Design Modal 的精简弹窗组件，保留声明式 `Modal` 与命令式 `useModal`，兼容 components-core Modal 常用调用（含 `footerButtons` 系统），并内置 SimpleBar 内容滚动与移动端全屏适配。
+`@kne/react-modal` 是基于 Ant Design 的弹层组件库，提供声明式 / 命令式 **Modal** 与 **Drawer**，兼容 `footerButtons` 体系，内置 SimpleBar 滚动与移动端适配。
 
 #### 主要特性
 
-- 声明式 / 命令式同一套 props 与 UI
-- `footer` + `footerButtons`（`ButtonComponent` / `display` / `autoClose`）与既有用法对齐
+- 声明式 / 命令式同一套 props 与 UI（Modal `useModal`；Drawer `useDrawer` + `DrawerContextHolder`；确认框 `useConfirmModal`）
+- `footer` + `footerButtons`（`ButtonComponent` / `display` / `autoClose`）
 - title / footer 固定在滚动外，body 默认 SimpleBar
-- `--kne-modal-*` CSS 变量管理 body / content 高度与 padding
-- 移动端全屏（`@kne/responsive-utils`）与嵌套挂载处理
-- 布局组合：`ModalTabsLayout`、`ModalColumnsLayout`、`ModalScrollRegion`；`createModalRender` 对接 `renderModal` 宿主
+- `--kne-modal-*` / `--kne-drawer-*` CSS 变量管理高度链
+- Modal 移动端全屏；Drawer 移动端侧滑全宽
+- **示例**：各场景示例顶部提供 **Modal / Drawer** 切换，同一套 props 与内容对比两种弹层
+- **共用布局**：`TabsLayout`、`ColumnsLayout`、`ScrollRegion`；`createModalRender` / `createDrawerRender` 对接 renderModal 宿主
 
 #### 使用场景
 
-需要在不打断当前流程的前提下打开浮层处理事务、表单确认或展示长内容时使用。Tabs 顶栏、N 列分栏、分步表单等可通过布局组件与 `createModalRender` 组合，无需业务侧手写 SCSS。
+列表快览、表单确认、侧滑详情、Tabs / 分栏复杂内容区均可通过布局组件组合，无需业务侧手写 SCSS。
 
 
 ### 示例
@@ -227,65 +228,99 @@ npm i --save @kne/react-modal
 
 #### 示例代码
 
-- 基础弹窗
-- 受控打开与异步 onConfirm（loading / 成功提示）
+- 基础弹层
+- Modal / Drawer 切换：受控打开与异步 onConfirm（loading / 成功提示）
 - _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),antd(antd)
 
 ```jsx
-const { default: Modal } = _ReactModal;
-const { Button, Space, message, App, Typography } = antd;
-const { useState } = React;
+const { default: Modal, Drawer, DrawerContextHolder } = _ReactModal;
+const { Button, Space, message, Typography, Radio, App } = antd;
+const { useState, useEffect } = React;
 
 const { Text, Paragraph } = Typography;
 
 const BasicExample = () => {
   const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState('modal');
+  const isDrawer = mode === 'drawer';
+
+  useEffect(() => {
+    if (open) {
+      setOpen(false);
+    }
+  }, [mode]);
+
+  const overlayProps = {
+    title: '保存评估备注',
+    open,
+    onClose: () => setOpen(false),
+    onConfirm: async () => {
+      await new Promise(resolve => setTimeout(resolve, 800));
+      message.success('备注已保存至候选人档案');
+    },
+    confirmText: '保存'
+  };
+
+  const content = (
+    <>
+      <Paragraph style={{ marginBottom: 8 }}>
+        将把当前页面的筛选条件与评估摘要一并写入 <Text strong>陈思远</Text> 的档案备注。
+      </Paragraph>
+      <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+        保存后可在「候选人详情 → 操作记录」中查看历史版本。
+      </Paragraph>
+    </>
+  );
 
   return (
     <Space direction="vertical" style={{ width: '100%' }} size="middle">
+      <Space align="center" wrap>
+        <Text type="secondary">打开方式</Text>
+        <Radio.Group
+          value={mode}
+          optionType="button"
+          size="small"
+          options={[
+            { label: 'Modal', value: 'modal' },
+            { label: 'Drawer', value: 'drawer' }
+          ]}
+          onChange={e => setMode(e.target.value)}
+        />
+      </Space>
       <Button type="primary" onClick={() => setOpen(true)}>
         保存评估备注
       </Button>
-      <Text type="secondary">最简受控弹窗：异步 onConfirm 带 loading，返回 false 可阻止关闭。</Text>
-      <Modal
-        title="保存评估备注"
-        open={open}
-        onClose={() => setOpen(false)}
-        onConfirm={async () => {
-          await new Promise(resolve => setTimeout(resolve, 800));
-          message.success('备注已保存至候选人档案');
-        }}
-        confirmText="保存"
-      >
-        <Paragraph style={{ marginBottom: 8 }}>
-          将把当前页面的筛选条件与评估摘要一并写入 <Text strong>陈思远</Text> 的档案备注。
-        </Paragraph>
-        <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-          保存后可在「候选人详情 → 操作记录」中查看历史版本。
-        </Paragraph>
-      </Modal>
+      <Text type="secondary">
+        最简受控弹层：切换 Modal / Drawer 对比同一套 props；异步 onConfirm 带 loading。
+      </Text>
+      {isDrawer ? (
+        <Drawer {...overlayProps} size="default">
+          {content}
+        </Drawer>
+      ) : (
+        <Modal {...overlayProps}>{content}</Modal>
+      )}
     </Space>
   );
 };
 
-const BaseExample = () => (
+render(
   <App>
+    <DrawerContextHolder />
     <BasicExample />
   </App>
 );
 
-render(<BaseExample />);
-
 ```
 
 - footerButtons 与尺寸
-- 岗位发布确认：size / footerButtons / 左侧 footer 插槽 / noPadding 预览
-- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),antd(antd)
+- Modal / Drawer 切换：size / footerButtons / 左侧 footer 插槽 / noPadding 预览
+- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),(@kne/current-lib_react-modal/doc/style.scss),antd(antd)
 
 ```jsx
-const { default: Modal } = _ReactModal;
-const { Button, Space, Radio, Tag, message, App, Typography } = antd;
-const { useState } = React;
+const { default: Modal, Drawer, DrawerContextHolder } = _ReactModal;
+const { Button, Space, Radio, Tag, message, Typography, App } = antd;
+const { useState, useEffect } = React;
 
 const { Text, Title, Paragraph } = Typography;
 
@@ -293,11 +328,85 @@ const FooterButtonsExample = () => {
   const [open, setOpen] = useState(false);
   const [size, setSize] = useState('default');
   const [noPadding, setNoPadding] = useState(false);
+  const [mode, setMode] = useState('modal');
+  const isDrawer = mode === 'drawer';
+
+  useEffect(() => {
+    if (open) {
+      setOpen(false);
+    }
+  }, [mode]);
+
+  const overlayProps = {
+    title: '确认发布岗位',
+    size,
+    noPadding,
+    open,
+    onClose: () => setOpen(false),
+    footer: <Text type="secondary">发布后将同步至招聘官网与内推渠道</Text>,
+    footerButtons: [
+      {
+        children: '存草稿',
+        onClick: () => message.info('已保存草稿')
+      },
+      {
+        children: '预览',
+        display: () => size !== 'small',
+        onClick: () => message.info('打开预览页')
+      },
+      {
+        type: 'primary',
+        children: '立即发布',
+        onClick: async () => {
+          await new Promise(resolve => setTimeout(resolve, 600));
+          message.success('岗位已发布');
+        }
+      }
+    ]
+  };
+
+  const content = (
+    <div className="demo-job-preview">
+      <div className="demo-job-preview-header">
+        <Title level={5} style={{ margin: 0 }}>
+          高级前端工程师
+        </Title>
+        <Space size={8} style={{ marginTop: 8 }}>
+          <Tag color="blue">上海</Tag>
+          <Tag>25K–40K · 15 薪</Tag>
+          <Tag color="green">急招</Tag>
+        </Space>
+      </div>
+      <div className="demo-job-preview-body">
+        <Paragraph style={{ marginTop: 0 }}>
+          负责招聘中台、候选人评估等 B 端产品的前端交付；要求熟悉 React、工程化与组件库协作。
+        </Paragraph>
+        <Paragraph style={{ marginBottom: 0 }}>
+          {noPadding
+            ? 'noPadding=true：预览卡片应贴齐内容区边缘。'
+            : 'noPadding=false：预览卡片四周保留默认内边距。'}
+        </Paragraph>
+      </div>
+    </div>
+  );
 
   return (
     <Space direction="vertical" style={{ width: '100%' }} size="large">
+      <Space align="center" wrap>
+        <Text type="secondary">打开方式</Text>
+        <Radio.Group
+          value={mode}
+          optionType="button"
+          size="small"
+          options={[
+            { label: 'Modal', value: 'modal' },
+            { label: 'Drawer', value: 'drawer' }
+          ]}
+          onChange={e => setMode(e.target.value)}
+        />
+      </Space>
       <div>
-        <Text type="secondary">切换尺寸与 noPadding，观察岗位预览卡片与 footer 按钮区布局。</Text>
+        <Text type="secondary">切换 Modal / Drawer、尺寸与 noPadding，观察预览卡片与 footer 按钮区布局。</Text>
       </div>
       <Radio.Group
         value={size}
@@ -317,86 +426,45 @@ const FooterButtonsExample = () => {
           noPadding={String(noPadding)}
         </Button>
       </Space>
-      <Modal
-        title="确认发布岗位"
-        size={size}
-        noPadding={noPadding}
-        open={open}
-        onClose={() => setOpen(false)}
-        footer={<Text type="secondary">发布后将同步至招聘官网与内推渠道</Text>}
-        footerButtons={[
-          {
-            children: '存草稿',
-            onClick: () => message.info('已保存草稿')
-          },
-          {
-            children: '预览',
-            display: () => size !== 'small',
-            onClick: () => message.info('打开预览页')
-          },
-          {
-            type: 'primary',
-            children: '立即发布',
-            onClick: async () => {
-              await new Promise(resolve => setTimeout(resolve, 600));
-              message.success('岗位已发布');
-            }
-          }
-        ]}
-      >
-        <div className="demo-job-preview">
-          <div className="demo-job-preview-header">
-            <Title level={5} style={{ margin: 0 }}>
-              高级前端工程师
-            </Title>
-            <Space size={8} style={{ marginTop: 8 }}>
-              <Tag color="blue">上海</Tag>
-              <Tag>25K–40K · 15 薪</Tag>
-              <Tag color="green">急招</Tag>
-            </Space>
-          </div>
-          <div className="demo-job-preview-body">
-            <Paragraph style={{ marginTop: 0 }}>
-              负责招聘中台、候选人评估等 B 端产品的前端交付；要求熟悉 React、工程化与组件库协作。
-            </Paragraph>
-            <Paragraph style={{ marginBottom: 0 }}>
-              {noPadding
-                ? 'noPadding=true：预览卡片应贴齐弹窗内容区边缘。'
-                : 'noPadding=false：预览卡片四周保留默认内边距。'}
-            </Paragraph>
-          </div>
-        </div>
-      </Modal>
+      {isDrawer ? (
+        <Drawer {...overlayProps}>{content}</Drawer>
+      ) : (
+        <Modal {...overlayProps}>{content}</Modal>
+      )}
     </Space>
   );
 };
 
-const BaseExample = () => (
+render(
   <App>
+    <DrawerContextHolder />
     <FooterButtonsExample />
   </App>
 );
 
-render(<BaseExample />);
-
 ```
 
-- useModal 命令式
-- 命令式打开候选人快览，children 函数内可 close()
+- 命令式打开（useModal / useDrawer）
+- 切换 Modal / Drawer：命令式快览，children 函数内可 close()
 - _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),antd(antd)
 
 ```jsx
-const { useModal } = _ReactModal;
-const { Button, Space, message, App, Descriptions, Tag, Typography } = antd;
+const { useModal, useDrawer, DrawerContextHolder } = _ReactModal;
+const { Button, Space, message, Descriptions, Tag, Typography, Radio, App } = antd;
+const { useState } = React;
 
 const { Text, Paragraph } = Typography;
 
 const CommandExample = () => {
   const modal = useModal();
+  const drawer = useDrawer();
+  const [mode, setMode] = useState('modal');
+  const isDrawer = mode === 'drawer';
 
   const openDetail = () => {
-    modal({
-      title: '候选人快览',
+    const api = isDrawer ? drawer : modal;
+    api({
+      title: isDrawer ? '候选人快览（侧滑）' : '候选人快览',
       size: 'small',
       confirmText: '加入待评估',
       children: ({ close }) => (
@@ -410,8 +478,8 @@ const CommandExample = () => {
             </Descriptions.Item>
           </Descriptions>
           <Paragraph type="secondary" style={{ marginBottom: 12 }}>
-            命令式弹窗适用于列表页「快速查看」场景；children 为函数时可调用 <Text code>close()</Text>{' '}
-            主动关闭。
+            命令式 {isDrawer ? 'Drawer' : 'Modal'} 适用于列表页「快速查看」；children 为函数时可调用{' '}
+            <Text code>close()</Text> 主动关闭。
           </Paragraph>
           <Button size="small" onClick={() => close()}>
             关闭
@@ -426,10 +494,129 @@ const CommandExample = () => {
 
   return (
     <Space direction="vertical">
+      <Space align="center" wrap>
+        <Text type="secondary">打开方式</Text>
+        <Radio.Group
+          value={mode}
+          optionType="button"
+          size="small"
+          options={[
+            { label: 'Modal', value: 'modal' },
+            { label: 'Drawer', value: 'drawer' }
+          ]}
+          onChange={e => setMode(e.target.value)}
+        />
+      </Space>
       <Button type="primary" onClick={openDetail}>
         从列表打开候选人快览
       </Button>
-      <Text type="secondary">需在 antd App 上下文中使用 useModal。</Text>
+      <Text type="secondary">
+        Drawer 模式需挂载 DrawerContextHolder；Modal 使用 antd App 内置 useModal。
+      </Text>
+    </Space>
+  );
+};
+
+render(
+  <App>
+    <DrawerContextHolder />
+    <CommandExample />
+  </App>
+);
+
+```
+
+- useConfirmModal 确认框
+- confirm / info / success / warning / error 命令式确认与提示（仅 Modal）
+- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),antd(antd)
+
+```jsx
+const { useConfirmModal } = _ReactModal;
+const { Button, Space, App } = antd;
+
+const CommandExample = () => {
+  const confirmModal = useConfirmModal();
+
+  return (
+    <Space wrap>
+      <Button
+        onClick={() => {
+          confirmModal({
+            danger: true,
+            type: 'confirm',
+            title: '确定要删除该记录吗？',
+            message: '此操作将永久删除该记录，相关数据将无法恢复。请确认是否继续删除操作？'
+          });
+        }}
+      >
+        confirm
+      </Button>
+      <Button
+        onClick={() => {
+          confirmModal({
+            type: 'confirm',
+            confirmType: 'warning',
+            title: '确定要编辑此内容吗？',
+            message: '编辑后需要重新提交审核，未保存的修改将丢失。请确认是否继续编辑？'
+          });
+        }}
+      >
+        confirm 警告
+      </Button>
+      <Button
+        onClick={() => {
+          confirmModal({
+            type: 'info',
+            title: '操作提示',
+            message: '该操作将更新系统配置，可能影响其他用户的使用。建议在非工作时间进行此操作。'
+          });
+        }}
+      >
+        info
+      </Button>
+      <Button
+        onClick={() => {
+          confirmModal({
+            type: 'info',
+            message: '数据已保存成功，系统将在后台进行同步处理，请稍候查看处理结果。'
+          });
+        }}
+      >
+        info 无标题
+      </Button>
+      <Button
+        onClick={() => {
+          confirmModal({
+            type: 'success',
+            title: '操作成功',
+            message: '恭喜！您的操作已成功完成。系统已发送通知邮件给相关团队成员。'
+          });
+        }}
+      >
+        success
+      </Button>
+      <Button
+        onClick={() => {
+          confirmModal({
+            type: 'warning',
+            title: '操作警告',
+            message: '检测到数据异常，继续操作可能导致数据不一致。建议先备份数据或联系技术支持。'
+          });
+        }}
+      >
+        warning
+      </Button>
+      <Button
+        onClick={() => {
+          confirmModal({
+            type: 'error',
+            title: '操作失败',
+            message: '系统处理出错，请检查网络连接或联系系统管理员。错误代码：ERR-500'
+          });
+        }}
+      >
+        error
+      </Button>
     </Space>
   );
 };
@@ -445,13 +632,13 @@ render(<BaseExample />);
 ```
 
 - 长内容滚动
-- 面试评估纪要：默认 SimpleBar vs bodyScroll=false 自管滚动
+- Modal / Drawer 切换：SimpleBar vs bodyScroll=false 自管滚动
 - _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),antd(antd)
 
 ```jsx
-const { default: Modal } = _ReactModal;
-const { Button, Space, App, Typography, Divider } = antd;
-const { useState } = React;
+const { default: Modal, Drawer, DrawerContextHolder } = _ReactModal;
+const { Button, Space, Typography, Divider, Radio, App } = antd;
+const { useState, useEffect } = React;
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -510,11 +697,38 @@ const EvaluationContent = () => (
 const LongContentExample = () => {
   const [open, setOpen] = useState(false);
   const [openSelfScroll, setOpenSelfScroll] = useState(false);
+  const [mode, setMode] = useState('modal');
+  const isDrawer = mode === 'drawer';
+
+  useEffect(() => {
+    if (open) {
+      setOpen(false);
+    }
+    if (openSelfScroll) {
+      setOpenSelfScroll(false);
+    }
+  }, [mode]);
+
+  const contentHeightVar = isDrawer ? '--kne-drawer-content-height' : '--kne-modal-content-height';
+  const Overlay = isDrawer ? Drawer : Modal;
 
   return (
     <Space direction="vertical" style={{ width: '100%' }} size="middle">
+      <Space align="center" wrap>
+        <Text type="secondary">打开方式</Text>
+        <Radio.Group
+          value={mode}
+          optionType="button"
+          size="small"
+          options={[
+            { label: 'Modal', value: 'modal' },
+            { label: 'Drawer', value: 'drawer' }
+          ]}
+          onChange={e => setMode(e.target.value)}
+        />
+      </Space>
       <Paragraph type="secondary" style={{ margin: 0 }}>
-        对比默认 SimpleBar 与 bodyScroll=false 自管滚动两种长内容场景。
+        对比默认 SimpleBar 与 bodyScroll=false 自管滚动；切换 Modal / Drawer 观察高度链一致。
       </Paragraph>
       <Space wrap>
         <Button type="primary" onClick={() => setOpen(true)}>
@@ -522,25 +736,27 @@ const LongContentExample = () => {
         </Button>
         <Button onClick={() => setOpenSelfScroll(true)}>自管滚动（bodyScroll=false）</Button>
       </Space>
-      <Modal
+      <Overlay
         title="陈思远 · 面试评估纪要"
         open={open}
         onClose={() => setOpen(false)}
         onConfirm={() => {}}
         confirmText="保存纪要"
+        size={isDrawer ? 'default' : undefined}
       >
         <EvaluationContent />
-      </Modal>
-      <Modal
+      </Overlay>
+      <Overlay
         title="自管滚动示例"
         open={openSelfScroll}
         onClose={() => setOpenSelfScroll(false)}
         bodyScroll={false}
         footer={null}
+        size={isDrawer ? 'large' : undefined}
       >
         <div
           style={{
-            height: 'var(--kne-modal-content-height)',
+            height: &#96;var(${contentHeightVar})&#96;,
             minHeight: 0,
             overflow: 'auto',
             boxSizing: 'border-box',
@@ -549,34 +765,35 @@ const LongContentExample = () => {
         >
           <div style={{ padding: 20 }}>
             <Paragraph style={{ marginTop: 0 }}>
-              内容区高度绑定 <Text code>--kne-modal-content-height</Text>，在 Tabs / 分栏场景同样适用。
+              内容区高度绑定 <Text code>{contentHeightVar}</Text>，Tabs / 分栏场景同样适用。
             </Paragraph>
             <EvaluationContent />
           </div>
         </div>
-      </Modal>
+      </Overlay>
     </Space>
   );
 };
 
-const BaseExample = () => (
+render(
   <App>
+    <DrawerContextHolder />
     <LongContentExample />
   </App>
 );
 
-render(<BaseExample />);
-
 ```
 
 - 高度 CSS 变量
-- Switch 对比默认/自定义 CSS 变量；色块绑定 --kne-modal-content-height，探针显示变量与 clientHeight
+- Modal / Drawer 切换：默认/自定义 CSS 变量；色块绑定 content-height，探针显示变量与 clientHeight
 - _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),antd(antd)
 
 ```jsx
-const { default: Modal } = _ReactModal;
-const { Button, Space, Switch, Tag, Descriptions, App } = antd;
+const { default: Modal, Drawer, DrawerContextHolder } = _ReactModal;
+const { Button, Space, Switch, Tag, Descriptions, Radio, Typography, App } = antd;
 const { useState, useEffect } = React;
+
+const { Text } = Typography;
 
 const readCssVar = (el, name) => {
   if (!el) {
@@ -585,8 +802,22 @@ const readCssVar = (el, name) => {
   return getComputedStyle(el).getPropertyValue(name).trim() || '-';
 };
 
-const HeightProbe = ({ open, revision }) => {
+const getOverlayChrome = mode => {
+  const isDrawer = mode === 'drawer';
+  return {
+    isDrawer,
+    testId: isDrawer ? 'react-drawer' : 'react-modal',
+    bodyClass: isDrawer ? 'drawer-body' : 'modal-body',
+    innerClass: isDrawer ? 'drawer-body-inner' : 'modal-body-inner',
+    contentHeightVar: isDrawer ? '--kne-drawer-content-height' : '--kne-modal-content-height',
+    bodyHeightVar: isDrawer ? '--kne-drawer-body-height' : '--kne-modal-body-height',
+    varPrefix: isDrawer ? '--kne-drawer' : '--kne-modal'
+  };
+};
+
+const HeightProbe = ({ open, revision, mode }) => {
   const [metrics, setMetrics] = useState(null);
+  const chrome = getOverlayChrome(mode);
 
   useEffect(() => {
     if (!open) {
@@ -594,34 +825,34 @@ const HeightProbe = ({ open, revision }) => {
       return undefined;
     }
     const timer = setTimeout(() => {
-      const outer = document.querySelector('[data-testid="react-modal"]');
-      const body = outer && outer.querySelector('.modal-body');
-      const inner = outer && outer.querySelector('.modal-body-inner');
+      const outer = document.querySelector(&#96;[data-testid="${chrome.testId}"]&#96;);
+      const body = outer && outer.querySelector(&#96;.${chrome.bodyClass}&#96;);
+      const inner = outer && outer.querySelector(&#96;.${chrome.innerClass}&#96;);
       const fill = outer && outer.querySelector('[data-vars-fill]');
       setMetrics({
-        gutter: readCssVar(outer, '--kne-modal-viewport-gutter'),
-        bodyHeightVar: readCssVar(body || outer, '--kne-modal-body-height'),
-        contentHeightVar: readCssVar(inner || body || outer, '--kne-modal-content-height'),
-        bodyMin: readCssVar(outer, '--kne-modal-body-min-height'),
-        paddingV: readCssVar(outer, '--kne-modal-body-padding-vertical'),
+        gutter: readCssVar(outer, &#96;${chrome.varPrefix}-viewport-gutter&#96;),
+        bodyHeightVar: readCssVar(body || outer, chrome.bodyHeightVar),
+        contentHeightVar: readCssVar(inner || body || outer, chrome.contentHeightVar),
+        bodyMin: readCssVar(outer, &#96;${chrome.varPrefix}-body-min-height&#96;),
+        paddingV: readCssVar(outer, &#96;${chrome.varPrefix}-body-padding-vertical&#96;),
         bodyClient: body ? &#96;${body.clientHeight}px&#96; : '-',
         fillClient: fill ? &#96;${fill.clientHeight}px&#96; : '-'
       });
     }, 80);
     return () => clearTimeout(timer);
-  }, [open, revision]);
+  }, [open, revision, mode, chrome]);
 
   if (!metrics) {
-    return <Tag>打开弹窗后显示变量与实测高度</Tag>;
+    return <Tag>打开弹层后显示变量与实测高度</Tag>;
   }
 
   return (
     <Descriptions size="small" bordered column={1} style={{ maxWidth: 640 }}>
-      <Descriptions.Item label="--kne-modal-viewport-gutter">{metrics.gutter}</Descriptions.Item>
-      <Descriptions.Item label="--kne-modal-body-min-height">{metrics.bodyMin}</Descriptions.Item>
-      <Descriptions.Item label="--kne-modal-body-padding-vertical">{metrics.paddingV}</Descriptions.Item>
-      <Descriptions.Item label="--kne-modal-body-height">{metrics.bodyHeightVar}</Descriptions.Item>
-      <Descriptions.Item label="--kne-modal-content-height">{metrics.contentHeightVar}</Descriptions.Item>
+      <Descriptions.Item label={&#96;${chrome.varPrefix}-viewport-gutter&#96;}>{metrics.gutter}</Descriptions.Item>
+      <Descriptions.Item label={&#96;${chrome.varPrefix}-body-min-height&#96;}>{metrics.bodyMin}</Descriptions.Item>
+      <Descriptions.Item label={&#96;${chrome.varPrefix}-body-padding-vertical&#96;}>{metrics.paddingV}</Descriptions.Item>
+      <Descriptions.Item label={chrome.bodyHeightVar}>{metrics.bodyHeightVar}</Descriptions.Item>
+      <Descriptions.Item label={chrome.contentHeightVar}>{metrics.contentHeightVar}</Descriptions.Item>
       <Descriptions.Item label="body.clientHeight">{metrics.bodyClient}</Descriptions.Item>
       <Descriptions.Item label="色块 clientHeight（应≈ content-height）">{metrics.fillClient}</Descriptions.Item>
     </Descriptions>
@@ -633,18 +864,47 @@ const fillLines = Array.from({ length: 18 }, (_, i) => &#96;填充行 ${i + 1} �
 const HeightVarsExample = () => {
   const [open, setOpen] = useState(false);
   const [customVars, setCustomVars] = useState(true);
-  const revision = &#96;${customVars}|${open}&#96;;
+  const [mode, setMode] = useState('modal');
+  const isDrawer = mode === 'drawer';
 
-  const modalStyle = customVars
-    ? {
-        '--kne-modal-viewport-gutter': '240px',
-        '--kne-modal-body-min-height': '180px',
-        '--kne-modal-body-padding-vertical': '64px'
-      }
+  useEffect(() => {
+    if (open) {
+      setOpen(false);
+    }
+  }, [mode]);
+
+  const chrome = getOverlayChrome(mode);
+  const revision = &#96;${mode}|${customVars}|${open}&#96;;
+  const Overlay = isDrawer ? Drawer : Modal;
+
+  const overlayStyle = customVars
+    ? isDrawer
+      ? {
+          '--kne-drawer-body-min-height': '180px',
+          '--kne-drawer-body-padding-vertical': '64px'
+        }
+      : {
+          '--kne-modal-viewport-gutter': '240px',
+          '--kne-modal-body-min-height': '180px',
+          '--kne-modal-body-padding-vertical': '64px'
+        }
     : undefined;
 
   return (
     <Space direction="vertical" style={{ width: '100%' }} size="middle">
+      <Space align="center" wrap>
+        <Text type="secondary">打开方式</Text>
+        <Radio.Group
+          value={mode}
+          optionType="button"
+          size="small"
+          options={[
+            { label: 'Modal', value: 'modal' },
+            { label: 'Drawer', value: 'drawer' }
+          ]}
+          onChange={e => setMode(e.target.value)}
+        />
+      </Space>
       <Space wrap align="center">
         <Switch
           checked={customVars}
@@ -653,29 +913,29 @@ const HeightVarsExample = () => {
           unCheckedChildren="默认变量"
         />
         <Button type="primary" onClick={() => setOpen(true)}>
-          打开弹窗对比高度
+          打开弹层对比高度
         </Button>
         <Tag color={customVars ? 'blue' : 'default'}>{customVars ? '已覆盖 CSS 变量' : '库内默认值'}</Tag>
       </Space>
       <div style={{ color: 'rgba(0,0,0,0.45)', maxWidth: 640 }}>
-        通过 Modal <code>style</code> 覆盖变量（挂在 <code>.modal</code> 根上）。自定义时加大{' '}
-        <code>viewport-gutter</code>、<code>body-padding-vertical</code>，body 会明显变矮；下方色块高度绑定{' '}
-        <code>--kne-modal-content-height</code>，应与实测 content 高度一致。
+        通过 <code>style</code> 覆盖 {chrome.varPrefix}-* 变量。Drawer 无 viewport-gutter；Modal 可加大 gutter
+        使 body 明显变矮。色块绑定 <code>{chrome.contentHeightVar}</code>。
       </div>
-      <HeightProbe open={open} revision={revision} />
-      <Modal
+      <HeightProbe open={open} revision={revision} mode={mode} />
+      <Overlay
         title={customVars ? '自定义高度 CSS 变量' : '默认高度 CSS 变量'}
         open={open}
         onClose={() => setOpen(false)}
         onConfirm={() => {}}
         bodyScroll={false}
         noPadding={false}
-        style={modalStyle}
+        style={overlayStyle}
+        size={isDrawer ? 'default' : undefined}
       >
         <div
           data-vars-fill
           style={{
-            height: 'var(--kne-modal-content-height)',
+            height: &#96;var(${chrome.contentHeightVar})&#96;,
             minHeight: 0,
             overflow: 'auto',
             boxSizing: 'border-box',
@@ -685,16 +945,8 @@ const HeightVarsExample = () => {
         >
           <div style={{ padding: 12 }}>
             <p style={{ marginTop: 0, fontWeight: 600 }}>
-              色块 height = var(--kne-modal-content-height)。切换「自定义/默认」后重新打开，对比色块高度与左侧探针数值。
+              色块 height = var({chrome.contentHeightVar})。切换「自定义/默认」与 Modal/Drawer 后重新打开对比。
             </p>
-            {customVars ? (
-              <p style={{ margin: '0 0 8px' }}>
-                当前覆盖：gutter 240px（默认 120px）、padding-vertical 64px（默认 48px）、body-min-height
-                180px。
-              </p>
-            ) : (
-              <p style={{ margin: '0 0 8px' }}>未传 style，使用库内 calc 与 size 默认 min-height。</p>
-            )}
             {fillLines.map(text => (
               <p key={text} style={{ margin: '4px 0' }}>
                 {text}
@@ -702,29 +954,30 @@ const HeightVarsExample = () => {
             ))}
           </div>
         </div>
-      </Modal>
+      </Overlay>
     </Space>
   );
 };
 
-const BaseExample = () => (
+render(
   <App>
+    <DrawerContextHolder />
     <HeightVarsExample />
   </App>
 );
 
-render(<BaseExample />);
-
 ```
 
 - title / footer / noPadding 高度探针
-- 切换 title 空/有、footer=null、footerButtons=[]、noPadding auto/true/false、bodyScroll，实测 body 与 content 高度变量与 clientHeight
+- Modal / Drawer 切换：title、footer、noPadding、bodyScroll 组合实测高度变量
 - _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),antd(antd)
 
 ```jsx
-const { default: Modal } = _ReactModal;
-const { Button, Space, Switch, Radio, Tag, Descriptions, App } = antd;
+const { default: Modal, Drawer, DrawerContextHolder } = _ReactModal;
+const { Button, Space, Switch, Radio, Tag, Descriptions, Typography, App } = antd;
 const { useState, useEffect } = React;
+
+const { Text } = Typography;
 
 const readCssVar = (el, name) => {
   if (!el) {
@@ -733,8 +986,22 @@ const readCssVar = (el, name) => {
   return getComputedStyle(el).getPropertyValue(name).trim() || '-';
 };
 
-const HeightProbe = ({ open, revision }) => {
+const getOverlayChrome = mode => {
+  const isDrawer = mode === 'drawer';
+  return {
+    isDrawer,
+    testId: isDrawer ? 'react-drawer' : 'react-modal',
+    bodyClass: isDrawer ? 'drawer-body' : 'modal-body',
+    innerClass: isDrawer ? 'drawer-body-inner' : 'modal-body-inner',
+    contentHeightVar: isDrawer ? '--kne-drawer-content-height' : '--kne-modal-content-height',
+    bodyHeightVar: isDrawer ? '--kne-drawer-body-height' : '--kne-modal-body-height',
+    varPrefix: isDrawer ? '--kne-drawer' : '--kne-modal'
+  };
+};
+
+const HeightProbe = ({ open, revision, mode }) => {
   const [metrics, setMetrics] = useState(null);
+  const chrome = getOverlayChrome(mode);
 
   useEffect(() => {
     if (!open) {
@@ -742,39 +1009,39 @@ const HeightProbe = ({ open, revision }) => {
       return undefined;
     }
     const timer = setTimeout(() => {
-      const outer = document.querySelector('[data-testid="react-modal"]');
-      const body = outer && outer.querySelector('.modal-body');
-      const inner = outer && outer.querySelector('.modal-body-inner');
+      const outer = document.querySelector(&#96;[data-testid="${chrome.testId}"]&#96;);
+      const body = outer && outer.querySelector(&#96;.${chrome.bodyClass}&#96;);
+      const inner = outer && outer.querySelector(&#96;.${chrome.innerClass}&#96;);
       const scrollHost = outer && outer.querySelector('[data-height-scroll-host]');
       setMetrics({
         outerClass: outer ? outer.className : '-',
-        bodyHeightVar: readCssVar(body || outer, '--kne-modal-body-height'),
-        contentHeightVar: readCssVar(inner || body || outer, '--kne-modal-content-height'),
-        paddingV: readCssVar(outer, '--kne-modal-body-padding-vertical'),
-        paddingH: readCssVar(outer, '--kne-modal-body-padding-horizontal'),
-        titleH: readCssVar(outer, '--kne-modal-title-height'),
-        footerH: readCssVar(outer, '--kne-modal-footer-height'),
+        bodyHeightVar: readCssVar(body || outer, chrome.bodyHeightVar),
+        contentHeightVar: readCssVar(inner || body || outer, chrome.contentHeightVar),
+        paddingV: readCssVar(outer, &#96;${chrome.varPrefix}-body-padding-vertical&#96;),
+        paddingH: readCssVar(outer, &#96;${chrome.varPrefix}-body-padding-horizontal&#96;),
+        titleH: readCssVar(outer, &#96;${chrome.varPrefix}-title-height&#96;),
+        footerH: readCssVar(outer, &#96;${chrome.varPrefix}-footer-height&#96;),
         bodyClient: body ? &#96;${body.clientHeight}px&#96; : '-',
         innerClient: inner ? &#96;${inner.clientHeight}px&#96; : '-',
         scrollClient: scrollHost ? &#96;${scrollHost.clientHeight}px&#96; : '-'
       });
     }, 80);
     return () => clearTimeout(timer);
-  }, [open, revision]);
+  }, [open, revision, mode, chrome]);
 
   if (!metrics) {
-    return <Tag>打开弹窗后显示实测高度</Tag>;
+    return <Tag>打开弹层后显示实测高度</Tag>;
   }
 
   return (
     <Descriptions size="small" bordered column={1} style={{ maxWidth: 640 }}>
       <Descriptions.Item label="outer class">{metrics.outerClass}</Descriptions.Item>
-      <Descriptions.Item label="--kne-modal-title-height">{metrics.titleH}</Descriptions.Item>
-      <Descriptions.Item label="--kne-modal-footer-height">{metrics.footerH}</Descriptions.Item>
-      <Descriptions.Item label="--kne-modal-body-padding-vertical">{metrics.paddingV}</Descriptions.Item>
-      <Descriptions.Item label="--kne-modal-body-padding-horizontal">{metrics.paddingH}</Descriptions.Item>
-      <Descriptions.Item label="--kne-modal-body-height">{metrics.bodyHeightVar}</Descriptions.Item>
-      <Descriptions.Item label="--kne-modal-content-height">{metrics.contentHeightVar}</Descriptions.Item>
+      <Descriptions.Item label={&#96;${chrome.varPrefix}-title-height&#96;}>{metrics.titleH}</Descriptions.Item>
+      <Descriptions.Item label={&#96;${chrome.varPrefix}-footer-height&#96;}>{metrics.footerH}</Descriptions.Item>
+      <Descriptions.Item label={&#96;${chrome.varPrefix}-body-padding-vertical&#96;}>{metrics.paddingV}</Descriptions.Item>
+      <Descriptions.Item label={&#96;${chrome.varPrefix}-body-padding-horizontal&#96;}>{metrics.paddingH}</Descriptions.Item>
+      <Descriptions.Item label={chrome.bodyHeightVar}>{metrics.bodyHeightVar}</Descriptions.Item>
+      <Descriptions.Item label={chrome.contentHeightVar}>{metrics.contentHeightVar}</Descriptions.Item>
       <Descriptions.Item label="body.clientHeight">{metrics.bodyClient}</Descriptions.Item>
       <Descriptions.Item label="body-inner.clientHeight">{metrics.innerClient}</Descriptions.Item>
       <Descriptions.Item label="scrollHost.clientHeight">{metrics.scrollClient}</Descriptions.Item>
@@ -785,39 +1052,59 @@ const HeightProbe = ({ open, revision }) => {
 const ChromeHeightExample = () => {
   const [open, setOpen] = useState(false);
   const [hasTitle, setHasTitle] = useState(true);
-  const [footerMode, setFooterMode] = useState('default'); // default | null | emptyButtons
+  const [footerMode, setFooterMode] = useState('default');
   const [bodyScroll, setBodyScroll] = useState(false);
-  const [noPaddingMode, setNoPaddingMode] = useState('auto'); // auto | true | false
-  const revision = [hasTitle, footerMode, bodyScroll, noPaddingMode, open].join('|');
+  const [noPaddingMode, setNoPaddingMode] = useState('auto');
+  const [mode, setMode] = useState('modal');
+  const isDrawer = mode === 'drawer';
 
-  const noPaddingProp =
-    noPaddingMode === 'auto' ? undefined : noPaddingMode === 'true';
+  useEffect(() => {
+    if (open) {
+      setOpen(false);
+    }
+  }, [mode]);
 
-  const modalProps = {
+  const chrome = getOverlayChrome(mode);
+  const Overlay = isDrawer ? Drawer : Modal;
+  const revision = [mode, hasTitle, footerMode, bodyScroll, noPaddingMode, open].join('|');
+
+  const noPaddingProp = noPaddingMode === 'auto' ? undefined : noPaddingMode === 'true';
+
+  const overlayProps = {
     open,
     onClose: () => setOpen(false),
     bodyScroll,
     ...(hasTitle ? { title: '候选人评估 · 高度调试' } : {}),
-    ...(noPaddingProp === undefined ? {} : { noPadding: noPaddingProp })
+    ...(noPaddingProp === undefined ? {} : { noPadding: noPaddingProp }),
+    size: isDrawer ? 'default' : undefined
   };
 
   if (footerMode === 'null') {
-    modalProps.footer = null;
+    overlayProps.footer = null;
   } else if (footerMode === 'emptyButtons') {
-    modalProps.footer = <span>仅左侧 footer，按钮为空数组</span>;
-    modalProps.footerButtons = [];
+    overlayProps.footer = <span>仅左侧 footer，按钮为空数组</span>;
+    overlayProps.footerButtons = [];
   } else {
-    modalProps.onConfirm = () => {};
+    overlayProps.onConfirm = () => {};
   }
-
-  const openModal = () => {
-    setOpen(true);
-  };
 
   const lines = Array.from({ length: 24 }, (_, i) => &#96;行 ${i + 1} · 用于观察滚动与高度是否贴齐&#96;);
 
   return (
     <Space direction="vertical" style={{ width: '100%' }} size="middle">
+      <Space align="center" wrap>
+        <Text type="secondary">打开方式</Text>
+        <Radio.Group
+          value={mode}
+          optionType="button"
+          size="small"
+          options={[
+            { label: 'Modal', value: 'modal' },
+            { label: 'Drawer', value: 'drawer' }
+          ]}
+          onChange={e => setMode(e.target.value)}
+        />
+      </Space>
       <Space wrap align="center">
         <span>title</span>
         <Switch checked={hasTitle} onChange={setHasTitle} checkedChildren="有" unCheckedChildren="空" />
@@ -854,29 +1141,21 @@ const ChromeHeightExample = () => {
           ]}
           onChange={e => setNoPaddingMode(e.target.value)}
         />
-        <div style={{ marginTop: 8, color: 'rgba(0,0,0,0.45)' }}>
-          bodyScroll=false 且未传 noPadding 时默认去掉内边距；显式 false 可保留 padding 观察差异。
-        </div>
       </div>
       <Space wrap>
-        <Button type="primary" onClick={openModal}>
-          打开评估弹窗并测量
+        <Button type="primary" onClick={() => setOpen(true)}>
+          打开并测量
         </Button>
-        <Tag>hasTitle={String(hasTitle)}</Tag>
+        <Tag>mode={mode}</Tag>
         <Tag>footerMode={footerMode}</Tag>
-        <Tag>bodyScroll={String(bodyScroll)}</Tag>
-        <Tag>
-          noPadding=
-          {noPaddingProp === undefined ? 'undefined(auto)' : String(noPaddingProp)}
-        </Tag>
       </Space>
-      <HeightProbe open={open} revision={revision} />
-      <Modal {...modalProps}>
+      <HeightProbe open={open} revision={revision} mode={mode} />
+      <Overlay {...overlayProps}>
         {bodyScroll === false ? (
           <div
             data-height-scroll-host
             style={{
-              height: 'var(--kne-modal-content-height)',
+              height: &#96;var(${chrome.contentHeightVar})&#96;,
               minHeight: 0,
               overflow: 'auto',
               boxSizing: 'border-box',
@@ -886,8 +1165,7 @@ const ChromeHeightExample = () => {
           >
             <div style={{ padding: 12 }}>
               <p style={{ marginTop: 0, fontWeight: 600 }}>
-                滚动宿主使用 height: var(--kne-modal-content-height)。蓝/橙底应与 body
-                内容区同高；footer=null 时 footer 变量应为 0。
+                滚动宿主 height: var({chrome.contentHeightVar})。footer=null 时 footer 变量应为 0。
               </p>
               {lines.map(text => (
                 <p key={text}>{text}</p>
@@ -911,31 +1189,32 @@ const ChromeHeightExample = () => {
             </div>
           </div>
         )}
-      </Modal>
+      </Overlay>
     </Space>
   );
 };
 
-const BaseExample = () => (
+render(
   <App>
+    <DrawerContextHolder />
     <ChromeHeightExample />
   </App>
 );
 
-render(<BaseExample />);
-
 ```
 
 - 批量候选人评估（Tabs + 分栏）
-- HR 批量面试评估：左列表右详情、搜索筛选、维度评分；固定分栏 / Splitter / 批次概览
+- Modal / Drawer 切换：Tabs 分栏 / Splitter / 批次概览
 - _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),antd(antd),(@kne/current-lib_react-modal/doc/style.scss)
 
 ```jsx
 const {
   default: Modal,
-  ModalTabsLayout,
-  ModalColumnsLayout,
-  ModalScrollRegion,
+  Drawer,
+  DrawerContextHolder,
+  TabsLayout,
+  ColumnsLayout,
+  ScrollRegion,
   modalClassNames
 } = _ReactModal;
 const {
@@ -950,9 +1229,10 @@ const {
   Typography,
   Divider,
   App,
-  message
+  message,
+  Radio
 } = antd;
-const { useState, useMemo } = React;
+const { useState, useMemo, useEffect } = React;
 
 const { Text, Title, Paragraph } = Typography;
 
@@ -1236,8 +1516,8 @@ const ColumnsPane = () => {
   const { setActive, search, setSearch, filtered, current } = useCandidatePanel();
 
   return (
-    <ModalColumnsLayout widths={['34%', '1fr']}>
-      <ModalScrollRegion>
+    <ColumnsLayout widths={['34%', '1fr']}>
+      <ScrollRegion>
         <CandidateList
           items={filtered}
           activeKey={current?.key}
@@ -1245,11 +1525,11 @@ const ColumnsPane = () => {
           search={search}
           onSearchChange={setSearch}
         />
-      </ModalScrollRegion>
-      <ModalScrollRegion inset>
+      </ScrollRegion>
+      <ScrollRegion inset>
         <CandidateDetail candidate={current} />
-      </ModalScrollRegion>
-    </ModalColumnsLayout>
+      </ScrollRegion>
+    </ColumnsLayout>
   );
 };
 
@@ -1267,7 +1547,7 @@ const SplitterPane = () => {
         max="52%"
       >
         <Splitter.Panel>
-          <ModalScrollRegion>
+          <ScrollRegion>
             <CandidateList
               items={filtered}
               activeKey={current?.key}
@@ -1275,12 +1555,12 @@ const SplitterPane = () => {
               search={search}
               onSearchChange={setSearch}
             />
-          </ModalScrollRegion>
+          </ScrollRegion>
         </Splitter.Panel>
         <Splitter.Panel>
-          <ModalScrollRegion inset>
+          <ScrollRegion inset>
             <CandidateDetail candidate={current} />
-          </ModalScrollRegion>
+          </ScrollRegion>
         </Splitter.Panel>
       </Splitter>
     </div>
@@ -1304,7 +1584,7 @@ const OverviewPane = () => {
   ];
 
   return (
-    <ModalScrollRegion>
+    <ScrollRegion>
       <div className="candidate-overview-stats">
         {[
           { label: '本批人数', value: stats.total },
@@ -1346,7 +1626,7 @@ const OverviewPane = () => {
         })}
         <Divider />
         <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-          概览 Tab 同样使用 ModalScrollRegion：批次统计与日程较长时在本面板内滚动，不影响 Tabs 顶栏与底部操作区。
+          概览 Tab 同样使用 ScrollRegion：批次统计与日程较长时在本面板内滚动，不影响 Tabs 顶栏与底部操作区。
         </Paragraph>
         {Array.from({ length: 6 }, (_, i) => (
           <Paragraph key={i} style={{ marginBottom: 8, color: 'rgba(0,0,0,0.45)' }}>
@@ -1354,25 +1634,60 @@ const OverviewPane = () => {
           </Paragraph>
         ))}
       </div>
-    </ModalScrollRegion>
+    </ScrollRegion>
   );
 };
 
 const ExtendLayoutExample = () => {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState('columns');
+  const [mode, setMode] = useState('modal');
+  const isDrawer = mode === 'drawer';
+
+  useEffect(() => {
+    if (open) {
+      setOpen(false);
+    }
+  }, [mode]);
+
+  const Overlay = isDrawer ? Drawer : Modal;
+
+  const layout = (
+    <TabsLayout
+      activeKey={tab}
+      onChange={setTab}
+      items={[
+        { key: 'columns', label: '候选人', children: <ColumnsPane /> },
+        { key: 'split', label: '可调分栏', children: <SplitterPane /> },
+        { key: 'overview', label: '批次概览', children: <OverviewPane /> }
+      ]}
+    />
+  );
 
   return (
     <Space direction="vertical" style={{ width: '100%' }} size="middle">
+      <Space align="center" wrap>
+        <Text type="secondary">打开方式</Text>
+        <Radio.Group
+          value={mode}
+          optionType="button"
+          size="small"
+          options={[
+            { label: 'Modal', value: 'modal' },
+            { label: 'Drawer', value: 'drawer' }
+          ]}
+          onChange={e => setMode(e.target.value)}
+        />
+      </Space>
       <div>
         <Button type="primary" onClick={() => setOpen(true)}>
-          打开批量评估弹窗
+          打开批量评估弹层
         </Button>
         <Paragraph type="secondary" style={{ margin: '8px 0 0' }}>
-          模拟 HR 批量面试评估：Tabs 占 title 位，左列表右详情，支持固定分栏 / 可调 Splitter / 批次概览。
+          模拟 HR 批量面试评估：Tabs 占 title 位，左列表右详情；切换 Modal / Drawer 对比布局高度链。
         </Paragraph>
       </div>
-      <Modal
+      <Overlay
         open={open}
         onClose={() => setOpen(false)}
         bodyScroll={false}
@@ -1384,39 +1699,30 @@ const ExtendLayoutExample = () => {
         confirmText="保存本批评估"
         cancelText="稍后处理"
       >
-        <ModalTabsLayout
-          activeKey={tab}
-          onChange={setTab}
-          items={[
-            { key: 'columns', label: '候选人', children: <ColumnsPane /> },
-            { key: 'split', label: '可调分栏', children: <SplitterPane /> },
-            { key: 'overview', label: '批次概览', children: <OverviewPane /> }
-          ]}
-        />
-      </Modal>
+        {layout}
+      </Overlay>
     </Space>
   );
 };
 
-const BaseExample = () => (
+render(
   <App>
+    <DrawerContextHolder />
     <ExtendLayoutExample />
   </App>
 );
 
-render(<BaseExample />);
-
 ```
 
-- useModal 内再开声明式 Modal
-- 导出评估报告：外层 useModal + 内层字段选择 Modal（嵌套 hoist）
+- 嵌套弹层（外层命令式 + 内层 Modal）
+- Modal / Drawer 切换外层；内层声明式 Modal 嵌套 hoist
 - _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),antd(antd)
 
 ```jsx
-const { default: Modal, useModal } = _ReactModal;
-const { Button, Space, Typography, Tag, App, message, Checkbox } = antd;
+const { default: Modal, useModal, useDrawer, DrawerContextHolder } = _ReactModal;
+const { Button, Space, Typography, Tag, message, Checkbox, Radio, App } = antd;
 const { useState, useEffect } = React;
-const { Text, Paragraph, Title } = Typography;
+const { Text, Paragraph } = Typography;
 
 const EXPORT_FIELDS = [
   { label: '基本信息', value: 'basic' },
@@ -1425,7 +1731,7 @@ const EXPORT_FIELDS = [
   { label: '附件简历', value: 'resume' }
 ];
 
-const NestProbe = ({ open }) => {
+const NestProbe = ({ open, isDrawer }) => {
   const [info, setInfo] = useState(null);
 
   useEffect(() => {
@@ -1434,46 +1740,40 @@ const NestProbe = ({ open }) => {
       return;
     }
     const id = window.setTimeout(() => {
-      const titles = Array.from(document.querySelectorAll('.ant-modal-root .modal-title'));
-      const outerTitle = titles.find(el => el.textContent === '导出评估报告');
+      const outerRootClass = isDrawer ? '.ant-drawer-root' : '.ant-modal-root';
+      const titleClass = isDrawer ? '.drawer-title' : '.modal-title';
+      const titles = Array.from(document.querySelectorAll(&#96;${outerRootClass} ${titleClass}&#96;));
+      const outerTitle = titles.find(el => el.textContent === (isDrawer ? '导出评估报告（侧滑）' : '导出评估报告'));
       const innerTitle = titles.find(el => el.textContent === '选择导出字段');
-      const outerRoot = outerTitle?.closest('.ant-modal-root');
+      const outerRoot = outerTitle?.closest(outerRootClass.slice(1));
       const innerRoot = innerTitle?.closest('.ant-modal-root');
-      const outerBody = outerRoot?.querySelector('.ant-modal-body');
-      const outerZ = Number(outerRoot?.querySelector('.ant-modal-wrap')?.style?.zIndex || 0);
-      const innerZ = Number(innerRoot?.querySelector('.ant-modal-wrap')?.style?.zIndex || 0);
+      const outerBody = outerRoot?.querySelector(isDrawer ? '.ant-drawer-body' : '.ant-modal-body');
       const hoisted = !!(innerRoot && outerBody && !outerBody.contains(innerRoot));
-      setInfo({ hoisted, outerZ, innerZ });
+      setInfo({ hoisted });
     }, 50);
     return () => window.clearTimeout(id);
-  }, [open]);
+  }, [open, isDrawer]);
 
   if (!info) {
     return <Text type="secondary">打开内层后显示挂载探针</Text>;
   }
 
   return (
-    <Space direction="vertical" size={4}>
-      <span>
-        内层挂载位置：
-        <Tag color={info.hoisted ? 'success' : 'error'} style={{ marginLeft: 8 }}>
-          {info.hoisted ? '外层 modal-root 外侧' : '异常'}
-        </Tag>
-      </span>
-      <Text type="secondary">zIndex 外层 {info.outerZ} / 内层 {info.innerZ}（antd 管理）</Text>
-    </Space>
+    <Tag color={info.hoisted ? 'success' : 'error'}>
+      内层 Modal {info.hoisted ? '已 hoist 到外层外侧' : '挂载异常'}
+    </Tag>
   );
 };
 
-const ExportFieldPicker = () => {
+const ExportFieldPicker = ({ isDrawer }) => {
   const [innerOpen, setInnerOpen] = useState(false);
   const [checked, setChecked] = useState(['basic', 'scores', 'notes']);
 
   return (
     <div>
       <Paragraph>
-        已选择本批 <Text strong>8</Text> 位候选人。导出前可勾选需要写入 PDF 的字段；内层声明式{' '}
-        <Text code>Modal</Text> 会自动 hoist，无需手动指定容器。
+        已选择本批 <Text strong>8</Text> 位候选人。内层始终为声明式 Modal；外层当前为{' '}
+        <Text code>{isDrawer ? 'Drawer' : 'Modal'}</Text>。
       </Paragraph>
       <Space>
         <Button type="primary" onClick={() => setInnerOpen(true)}>
@@ -1482,7 +1782,7 @@ const ExportFieldPicker = () => {
         <Text type="secondary">已选 {checked.length} 项</Text>
       </Space>
       <div style={{ marginTop: 12 }}>
-        <NestProbe open={innerOpen} />
+        <NestProbe open={innerOpen} isDrawer={isDrawer} />
       </div>
       <Modal
         title="选择导出字段"
@@ -1508,47 +1808,63 @@ const ExportFieldPicker = () => {
 
 const NestedModalExample = () => {
   const modal = useModal();
+  const drawer = useDrawer();
+  const [mode, setMode] = useState('modal');
+  const isDrawer = mode === 'drawer';
 
   return (
     <Space direction="vertical" style={{ width: '100%' }} size="middle">
+      <Space align="center" wrap>
+        <Text type="secondary">打开方式</Text>
+        <Radio.Group
+          value={mode}
+          optionType="button"
+          size="small"
+          options={[
+            { label: 'Modal', value: 'modal' },
+            { label: 'Drawer', value: 'drawer' }
+          ]}
+          onChange={e => setMode(e.target.value)}
+        />
+      </Space>
       <Button
         type="primary"
         onClick={() => {
-          modal({
-            title: '导出评估报告',
+          const api = isDrawer ? drawer : modal;
+          api({
+            title: isDrawer ? '导出评估报告（侧滑）' : '导出评估报告',
             size: 'default',
-            children: <ExportFieldPicker />,
+            children: <ExportFieldPicker isDrawer={isDrawer} />,
             onConfirm: () => message.success('报告已进入生成队列'),
             confirmText: '开始导出'
           });
         }}
       >
-        导出本批评估（嵌套弹窗）
+        导出本批评估（嵌套弹层）
       </Button>
-      <Text type="secondary">外层 useModal + 内层声明式 Modal：关闭内层不影响外层。</Text>
+      <Text type="secondary">外层 Modal / Drawer 命令式 + 内层声明式 Modal 嵌套 hoist。</Text>
     </Space>
   );
 };
 
-const BaseExample = () => (
+render(
   <App>
+    <DrawerContextHolder />
     <NestedModalExample />
   </App>
 );
 
-render(<BaseExample />);
-
 ```
 
-- FormInfo FormModal + renderModal
-- 超长表单：用 @kne/react-modal 重写 renderModal，验收 title/footer 固定与 body SimpleBar 滚动（可关 bodyScroll 对比）
+- FormModal + renderModal
+- Modal / Drawer 切换：超长表单，createModalRender / createDrawerRender
 - _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),_FormInfo(@kne/form-info)[import * as _FormInfo from "@kne/form-info"],(@kne/form-info/dist/index.css),antd(antd)
 
 ```jsx
-const { createModalRender } = _ReactModal;
+const { createModalRender, createDrawerRender, DrawerContextHolder } = _ReactModal;
 const { default: FormInfo, FormModal, Input, TextArea } = _FormInfo;
-const { Button, Space, Typography, App, message, Switch, Flex } = antd;
-const { useState, useMemo } = React;
+const { Button, Space, Typography, App, message, Switch, Flex, Radio } = antd;
+const { useState, useMemo, useEffect } = React;
 const { Text, Paragraph } = Typography;
 
 const SECTION_DEFS = [
@@ -1670,13 +1986,19 @@ const LongFormFields = () => (
 const FormInfoModalExample = () => {
   const [open, setOpen] = useState(false);
   const [bodyScroll, setBodyScroll] = useState(true);
+  const [mode, setMode] = useState('modal');
+  const isDrawer = mode === 'drawer';
   const initialData = useMemo(() => buildInitialData(), []);
 
-  const renderModalBase = createModalRender({
-    footerButtons: [],
-    bodyScroll: true,
-    size: 'large'
-  });
+  useEffect(() => {
+    if (open) {
+      setOpen(false);
+    }
+  }, [mode]);
+
+  const renderModalBase = isDrawer
+    ? createDrawerRender({ placement: 'right', footerButtons: [], bodyScroll: true, size: 'large' })
+    : createModalRender({ footerButtons: [], bodyScroll: true, size: 'large' });
 
   const renderModal = ({
     formProps,
@@ -1699,6 +2021,19 @@ const FormInfoModalExample = () => {
 
   return (
     <Space direction="vertical" style={{ width: '100%' }}>
+      <Space align="center" wrap>
+        <Text type="secondary">打开方式</Text>
+        <Radio.Group
+          value={mode}
+          optionType="button"
+          size="small"
+          options={[
+            { label: 'Modal', value: 'modal' },
+            { label: 'Drawer', value: 'drawer' }
+          ]}
+          onChange={e => setMode(e.target.value)}
+        />
+      </Space>
       <Space wrap>
         <Button type="primary" onClick={() => setOpen(true)}>
           打开深度评估表单（FormModal）
@@ -1709,11 +2044,11 @@ const FormInfoModalExample = () => {
         </Space>
       </Space>
       <Text type="secondary">
-        createModalRender 注入 Modal 默认 props；form-info 宿主字段与 onCancel→onClose 在 renderModal 内映射。
+        createModalRender / createDrawerRender 注入默认 props；切换 Modal / Drawer 对比 form-info 宿主集成。
       </Text>
 
       <FormModal
-        title="候选人深度评估（超长表单）"
+        title={isDrawer ? '候选人深度评估（侧滑）' : '候选人深度评估（超长表单）'}
         open={open}
         onCancel={() => setOpen(false)}
         renderModal={renderModal}
@@ -1734,35 +2069,43 @@ const FormInfoModalExample = () => {
   );
 };
 
-const BaseExample = () => (
+render(
   <App>
+    <DrawerContextHolder />
     <FormInfoModalExample />
   </App>
 );
 
-render(<BaseExample />);
-
 ```
 
 - FormStepsModal + renderModal
-- 分步表单：FormStepsModal 在 modalProps 中传 renderModal；步骤内 FormInfo gap + Flex 垂直间距
+- Modal / Drawer 切换：分步表单，步骤内 FormInfo gap + Flex 垂直间距
 - _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),_FormInfo(@kne/form-info)[import * as _FormInfo from "@kne/form-info"],(@kne/form-info/dist/index.css),antd(antd)
 
 ```jsx
-const { createModalRender, modalClassNames } = _ReactModal;
+const { createModalRender, createDrawerRender, modalClassNames, DrawerContextHolder } = _ReactModal;
 const { default: FormInfo, FormStepsModal, List, Input, TextArea } = _FormInfo;
-const { Button, Space, Typography, App, message, Flex } = antd;
-const { useState } = React;
+const { Button, Space, Typography, App, message, Flex, Radio } = antd;
+const { useState, useEffect } = React;
 const { Text } = Typography;
 
-const renderStepsModalBase = createModalRender({
-  footerButtons: [],
-  bodyScroll: true,
-  size: 'default',
-  className: modalClassNames.stepsForm
-});
+const renderStepsModalBase = isDrawer =>
+  isDrawer
+    ? createDrawerRender({
+        placement: 'right',
+        footerButtons: [],
+        bodyScroll: true,
+        size: 'default',
+        className: modalClassNames.stepsForm
+      })
+    : createModalRender({
+        footerButtons: [],
+        bodyScroll: true,
+        size: 'default',
+        className: modalClassNames.stepsForm
+      });
 
-const renderStepsModal = ({
+const renderStepsModal = isDrawer => ({
   formProps,
   saveText,
   autoClose,
@@ -1773,7 +2116,7 @@ const renderStepsModal = ({
   className,
   ...props
 }) =>
-  renderStepsModalBase({
+  renderStepsModalBase(isDrawer)({
     ...props,
     className,
     onClose: onCancel,
@@ -1807,15 +2150,34 @@ const STEP_DATA = {
 
 const FormInfoStepsModalExample = () => {
   const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState('modal');
+  const isDrawer = mode === 'drawer';
+
+  useEffect(() => {
+    if (open) {
+      setOpen(false);
+    }
+  }, [mode]);
 
   return (
     <Space direction="vertical" style={{ width: '100%' }}>
+      <Space align="center" wrap>
+        <Text type="secondary">打开方式</Text>
+        <Radio.Group
+          value={mode}
+          optionType="button"
+          size="small"
+          options={[
+            { label: 'Modal', value: 'modal' },
+            { label: 'Drawer', value: 'drawer' }
+          ]}
+          onChange={e => setMode(e.target.value)}
+        />
+      </Space>
       <Button type="primary" onClick={() => setOpen(true)}>
         打开分步评估（FormStepsModal）
       </Button>
-      <Text type="secondary">
-        三步完成候选人评估：基本信息 → 维度评分 → 经历与结论。
-      </Text>
+      <Text type="secondary">三步完成候选人评估；切换 Modal / Drawer 对比分步表单高度链。</Text>
 
       <FormStepsModal
         autoStep
@@ -1827,10 +2189,10 @@ const FormInfoStepsModalExample = () => {
         }}
         modalProps={{
           open,
-          title: '候选人评估（分步）',
+          title: isDrawer ? '候选人评估（侧滑分步）' : '候选人评估（分步）',
           width: 900,
           onCancel: () => setOpen(false),
-          renderModal: renderStepsModal
+          renderModal: renderStepsModal(isDrawer)
         }}
         items={[
           {
@@ -1922,13 +2284,12 @@ const FormInfoStepsModalExample = () => {
   );
 };
 
-const BaseExample = () => (
+render(
   <App>
+    <DrawerContextHolder />
     <FormInfoStepsModalExample />
   </App>
 );
-
-render(<BaseExample />);
 
 ```
 
@@ -1988,6 +2349,39 @@ render(<BaseExample />);
 |------|------|------|
 | modal | function | 调用后弹出 Modal；返回 `{ close }`；默认 `zIndex` 为 1100 |
 
+#### useConfirmModal
+
+命令式确认 / 提示弹窗，底层走 antd `App.modal` 的 `confirm` / `info` / `success` / `warning` / `error`。需在 antd `App` 上下文中使用。
+
+##### 参数
+
+| 属性 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| type | `confirm` \| `info` \| `success` \| `warning` \| `error` | `confirm` | 调用 `modal[type]` |
+| title | ReactNode | - | 标题 |
+| message | ReactNode | - | 正文 |
+| danger | boolean | false | 为 true 时展示语义图标，确认钮危险色 |
+| confirmType | `info` \| `warning` \| `error` \| `success` | `info` | `type=confirm` 时图标语义 |
+| icon | ReactNode | - | 自定义图标，覆盖默认 |
+| onConfirm | function | - | 映射 antd `onOk` |
+| onCancel | function | - | 映射 antd `onCancel` |
+| confirmText | ReactNode | - | 映射 `okText` |
+| cancelText | ReactNode | - | 映射 `cancelText` |
+| onClose | function | - | 调用 `close()` 时触发 |
+| maskClosable | boolean | false | 默认不可点蒙层关闭 |
+| getContainer | HTMLElement \| function | - | 嵌套时挂到外层 modal 外侧 |
+| afterClose / zIndex / wrapClassName | - | - | 透传；默认 `zIndex` 1100 |
+
+其余未列出参数按 antd Modal.confirm 习惯透传。
+
+##### 返回值
+
+| 属性 | 类型 | 描述 |
+|------|------|------|
+| confirmModal | function | 调用后弹出确认框；返回 `{ close }` |
+
+与 `useModal` 对比：专用于短文案确认 / 提示，桌面居中窄宽（约 400px），无 SimpleBar body。
+
 #### CSS 变量
 
 挂在 `.modal` / `.modal-outer` 上，可业务覆盖。
@@ -2007,33 +2401,33 @@ render(<BaseExample />);
 | `--kne-modal-content-min-height` | content 侧 min |
 | `--kne-modal-content-width` | 内容宽度契约（扣 horizontal padding） |
 
-#### 布局组合
+#### 布局组合（Modal / Drawer 共用）
 
-Tabs / N 列分栏等复杂内容区须 **`bodyScroll={false}`**，由 `ModalScrollRegion`（SimpleBar）分区滚动，避免与 Modal body 双层 SimpleBar。
+Tabs / N 列分栏等复杂内容区须 **`bodyScroll={false}`**，由 `ScrollRegion`（SimpleBar）分区滚动，避免与弹层 body 双层 SimpleBar。
 
-##### ModalTabsLayout
+##### TabsLayout
 
-antd `Tabs` 封装：顶栏占 title 位（配合无 `title` 的 Modal）、antd6 高度链、`destroyOnHidden` 默认 true。其余 props 透传 Tabs。
+antd `Tabs` 封装：顶栏占 title 位（配合无 `title` 的弹层）、antd6 高度链、`destroyOnHidden` 默认 true。其余 props 透传 Tabs。
 
-##### ModalColumnsLayout
+##### ColumnsLayout
 
 固定 N 列 flex 分栏。`widths` 与 `children` 等长（如 `['36%', '1fr']`、`['200px', '1fr', '280px']`）；`'1fr'` 占剩余宽度。
 
-##### ModalScrollRegion
+##### ScrollRegion
 
 单块 SimpleBar 滚动区，用于 Tab 面板或每一列。首列/末列背景由父级 `:first-child` / `:last-child` 选中。
 
 - `inset`（默认 `false`）：为 `true` 时内容区增加 `16px 20px` 内边距（适合详情、概览等单列内容）
 - 分栏列表左列通常保持 `inset={false}`，由列表项自行控制间距
 
-Tabs / 分栏弹窗须 **`bodyScroll={false}`**，此时 Modal 默认 **noPadding**（内容贴边），以便分栏铺满 body；需要外层留白时可传 **`noPadding={false}`**。
+Tabs / 分栏弹层须 **`bodyScroll={false}`**，此时默认 **noPadding**（内容贴边），以便分栏铺满 body；需要外层留白时可传 **`noPadding={false}`**。
 
 ##### modalClassNames
 
 | 常量 | 值 | 用途 |
 |------|-----|------|
-| `stepsForm` | `react-modal-steps-form` | 分步弹窗挂 Modal `className`，去横向溢出 |
-| `splitter` | `react-modal-splitter` | antd Splitter 在 Modal 内的高度链 |
+| `stepsForm` | `react-modal-steps-form` | 分步弹窗挂 `className`，去横向溢出 |
+| `splitter` | `react-modal-splitter` | antd Splitter 在弹层内的高度链 |
 
 ##### createModalRender
 
@@ -2050,5 +2444,39 @@ createModalRender(modalDefaults) => (hostProps) => Modal
 | 子内容自带 Footer | `{ footerButtons: [] }` |
 | 长内容 | `{ footerButtons: [], bodyScroll: true, size: 'large' }` |
 | 分步弹窗 | `{ footerButtons: [], bodyScroll: true, size: 'default', className: modalClassNames.stepsForm }` |
+
+#### Drawer
+
+声明式侧滑层。基于 antd Drawer，关闭请使用 `onClose`（内部映射 antd `onClose`）。API 与 Modal 对齐处不再重复；差异如下。
+
+##### 属性（差异与补充）
+
+| 属性 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| placement | `left` \| `right` \| `top` \| `bottom` | `right` | 滑出方向；`size` 映射 width（left/right）或 height（top/bottom） |
+| size | `small` \| `default` \| `large` | `default` | 600 / 1000 / min(vw−64, 1500) px |
+| 移动端 | - | 侧滑全宽 | left/right → 100vw；top/bottom → 100vh（非 Modal 式全屏居中） |
+
+其余 `open` / `onClose` / `title` / `children` / `footer` / `footerButtons` / `bodyScroll` / `noPadding` / `closable` / `maskClosable` / `getContainer` 等与 Modal 相同。
+
+**FormModal**：传入的 `modalRender` 会在 Drawer 内注入 `ModalForm`，包裹整块 chrome（title / body / footer，与 Modal 的 panel 语义一致）；footer 内 Submit/Cancel 需在 Form 上下文内。
+
+嵌套时默认挂到外层 `.ant-drawer-root` 外侧。
+
+#### useDrawer
+
+命令式打开 Drawer，参数同 Drawer。须在 antd `App` 内挂载 **`<DrawerContextHolder />`**（对标 antd 内置 `ModalContextHolder`），签名与 `useModal` 相同：`const drawer = useDrawer(); drawer(props) → { close }`。
+
+#### Drawer CSS 变量
+
+挂在 `.drawer` / `.drawer-outer` 上；命名 `--kne-drawer-*`，语义与 Modal 对齐（无 viewport gutter，body 占满面板高度链）。`.drawer-outer` 内 bridge `--kne-modal-content-height` 等，供共用 `ScrollRegion` / `TabsLayout` 高度链。
+
+#### createDrawerRender
+
+```ts
+createDrawerRender(drawerDefaults) => (hostProps) => Drawer
+```
+
+单参数合并渲染；宿主字段映射由 `renderModal` 回调内完成（同 `createModalRender`）。
 
 <!--END_SECTION:DOC_MD-->

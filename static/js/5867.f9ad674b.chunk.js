@@ -1,0 +1,2 @@
+"use strict";(globalThis.webpackChunk_react_modal_0_1_4||=[]).push([[5867],{85867(e,r,t){var n=t(94922);t.d(r,["A",0,function(e){let r=arguments.length>1&&void 0!==arguments[1]&&arguments[1];const t=(0,n.useRef)(e);return r||(t.current=e),(0,n.useCallback)(function(){return t.current&&t.current(...arguments)},[])}])}}]);
+//# sourceMappingURL=5867.f9ad674b.chunk.js.map
