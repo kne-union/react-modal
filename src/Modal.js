@@ -200,6 +200,7 @@ const computedCommonProps = ({
   classNames: propsClassNames,
   styles: propsStyles,
   style: propsStyle,
+  modalRender,
   ...props
 }) => {
   const useMobileLayout = isMobile && mobileFullscreen !== false;
@@ -209,7 +210,7 @@ const computedCommonProps = ({
 
   const runChildren = options => {
     const opts = Object.assign({}, options, { close: onClose });
-    return (
+    const modalPanel = (
       <ModalOuter
         title={renderWithOptions(title, opts)}
         closable={closable}
@@ -228,6 +229,8 @@ const computedCommonProps = ({
         {renderWithOptions(children, opts)}
       </ModalOuter>
     );
+
+    return typeof modalRender === 'function' ? modalRender(modalPanel) : modalPanel;
   };
 
   return {
@@ -235,7 +238,7 @@ const computedCommonProps = ({
     icon: null,
     centered: !useMobileLayout,
     width: props.width ?? (useMobileLayout ? 'var(--kne-modal-viewport-width, 100vw)' : width),
-    wrapClassName: classnames(wrapClassName, style['modal-wrap'], useMobileLayout ? style['modal-wrap-fullscreen'] : style['modal-wrap-centered'], useMobileLayout && fixedModeClass),
+    wrapClassName: classnames(wrapClassName, style['modal-wrap'], useMobileLayout ? style['modal-wrap-fullscreen'] : style['modal-wrap-centered'], useMobileLayout && fixedModeClass, modalRender && style['modal-form-host']),
     classNames: Object.assign({}, propsClassNames, {
       mask: classnames(propsClassNames?.mask, useMobileLayout && style['modal-mask-fullscreen'], useMobileLayout && fixedModeClass),
       container: classnames(style['modal-container'], useMobileLayout && style['is-mobile'], propsClassNames?.container),
