@@ -313,7 +313,7 @@ render(
 
 - footerButtons 与尺寸
 - Modal / Drawer 切换：size / footerButtons / 左侧 footer 插槽 / noPadding 预览
-- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),(@kne/current-lib_react-modal/doc/style.scss),antd(antd)
+- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),antd(antd)
 
 ```jsx
 const { default: Modal, Drawer, DrawerContextHolder } = _ReactModal;
@@ -1203,7 +1203,7 @@ render(
 
 - 批量候选人评估（Tabs + 分栏）
 - Modal / Drawer 切换：Tabs 分栏 / Splitter / 批次概览
-- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),antd(antd),(@kne/current-lib_react-modal/doc/style.scss)
+- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),antd(antd)
 
 ```jsx
 const {

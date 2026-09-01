@@ -34,9 +34,6 @@
           "packageName": "@kne/current-lib_react-modal/dist/index.css"
         },
         {
-          "packageName": "@kne/current-lib_react-modal/doc/style.scss"
-        },
-        {
           "name": "antd",
           "packageName": "antd"
         }
@@ -153,9 +150,6 @@
         {
           "name": "antd",
           "packageName": "antd"
-        },
-        {
-          "packageName": "@kne/current-lib_react-modal/doc/style.scss"
         }
       ]
     },
