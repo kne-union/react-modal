@@ -1,0 +1,214 @@
+{
+  "isFull": false,
+  "list": [
+    {
+      "title": "基础弹窗",
+      "description": "受控打开与异步 onConfirm（loading / 成功提示）",
+      "code": "./base.js",
+      "scope": [
+        {
+          "name": "_ReactModal",
+          "packageName": "@kne/current-lib_react-modal",
+          "importStatement": "import * as _ReactModal from \"@kne/react-modal\""
+        },
+        {
+          "packageName": "@kne/current-lib_react-modal/dist/index.css"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "footerButtons 与尺寸",
+      "description": "岗位发布确认：size / footerButtons / 左侧 footer 插槽 / noPadding 预览",
+      "code": "./footer-buttons.js",
+      "scope": [
+        {
+          "name": "_ReactModal",
+          "packageName": "@kne/current-lib_react-modal",
+          "importStatement": "import * as _ReactModal from \"@kne/react-modal\""
+        },
+        {
+          "packageName": "@kne/current-lib_react-modal/dist/index.css"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "useModal 命令式",
+      "description": "命令式打开候选人快览，children 函数内可 close()",
+      "code": "./use-modal.js",
+      "scope": [
+        {
+          "name": "_ReactModal",
+          "packageName": "@kne/current-lib_react-modal",
+          "importStatement": "import * as _ReactModal from \"@kne/react-modal\""
+        },
+        {
+          "packageName": "@kne/current-lib_react-modal/dist/index.css"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "长内容滚动",
+      "description": "面试评估纪要：默认 SimpleBar vs bodyScroll=false 自管滚动",
+      "code": "./body-scroll.js",
+      "scope": [
+        {
+          "name": "_ReactModal",
+          "packageName": "@kne/current-lib_react-modal",
+          "importStatement": "import * as _ReactModal from \"@kne/react-modal\""
+        },
+        {
+          "packageName": "@kne/current-lib_react-modal/dist/index.css"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "高度 CSS 变量",
+      "description": "Switch 对比默认/自定义 CSS 变量；色块绑定 --kne-modal-content-height，探针显示变量与 clientHeight",
+      "code": "./body-height-vars.js",
+      "scope": [
+        {
+          "name": "_ReactModal",
+          "packageName": "@kne/current-lib_react-modal",
+          "importStatement": "import * as _ReactModal from \"@kne/react-modal\""
+        },
+        {
+          "packageName": "@kne/current-lib_react-modal/dist/index.css"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "title / footer / noPadding 高度探针",
+      "description": "切换 title 空/有、footer=null、footerButtons=[]、noPadding auto/true/false、bodyScroll，实测 body 与 content 高度变量与 clientHeight",
+      "code": "./chrome-height.js",
+      "scope": [
+        {
+          "name": "_ReactModal",
+          "packageName": "@kne/current-lib_react-modal",
+          "importStatement": "import * as _ReactModal from \"@kne/react-modal\""
+        },
+        {
+          "packageName": "@kne/current-lib_react-modal/dist/index.css"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "批量候选人评估（Tabs + 分栏）",
+      "description": "HR 批量面试评估：左列表右详情、搜索筛选、维度评分；固定分栏 / Splitter / 批次概览",
+      "code": "./extend-layout.js",
+      "scope": [
+        {
+          "name": "_ReactModal",
+          "packageName": "@kne/current-lib_react-modal",
+          "importStatement": "import * as _ReactModal from \"@kne/react-modal\""
+        },
+        {
+          "packageName": "@kne/current-lib_react-modal/dist/index.css"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        },
+        {
+          "packageName": "@kne/current-lib_react-modal/doc/style.scss"
+        }
+      ]
+    },
+    {
+      "title": "useModal 内再开声明式 Modal",
+      "description": "导出评估报告：外层 useModal + 内层字段选择 Modal（嵌套 hoist）",
+      "code": "./nested-modal.js",
+      "scope": [
+        {
+          "name": "_ReactModal",
+          "packageName": "@kne/current-lib_react-modal",
+          "importStatement": "import * as _ReactModal from \"@kne/react-modal\""
+        },
+        {
+          "packageName": "@kne/current-lib_react-modal/dist/index.css"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "FormInfo FormModal + renderModal",
+      "description": "超长表单：用 @kne/react-modal 重写 renderModal，验收 title/footer 固定与 body SimpleBar 滚动（可关 bodyScroll 对比）",
+      "code": "./form-info-modal.js",
+      "scope": [
+        {
+          "name": "_ReactModal",
+          "packageName": "@kne/current-lib_react-modal",
+          "importStatement": "import * as _ReactModal from \"@kne/react-modal\""
+        },
+        {
+          "packageName": "@kne/current-lib_react-modal/dist/index.css"
+        },
+        {
+          "name": "_FormInfo",
+          "packageName": "@kne/form-info",
+          "importStatement": "import * as _FormInfo from \"@kne/form-info\""
+        },
+        {
+          "packageName": "@kne/form-info/dist/index.css"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "FormStepsModal + renderModal",
+      "description": "分步表单：FormStepsModal 在 modalProps 中传 renderModal；步骤内 FormInfo gap + Flex 垂直间距",
+      "code": "./form-info-steps-modal.js",
+      "scope": [
+        {
+          "name": "_ReactModal",
+          "packageName": "@kne/current-lib_react-modal",
+          "importStatement": "import * as _ReactModal from \"@kne/react-modal\""
+        },
+        {
+          "packageName": "@kne/current-lib_react-modal/dist/index.css"
+        },
+        {
+          "name": "_FormInfo",
+          "packageName": "@kne/form-info",
+          "importStatement": "import * as _FormInfo from \"@kne/form-info\""
+        },
+        {
+          "packageName": "@kne/form-info/dist/index.css"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    }
+  ]
+}

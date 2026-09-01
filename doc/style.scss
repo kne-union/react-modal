@@ -1,0 +1,182 @@
+/* 示例业务 UI（布局滚动等仍用 @kne/react-modal/dist/index.css） */
+
+.candidate-list-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.candidate-list-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #f5f5f5;
+  transition: background 0.15s ease;
+
+  &:hover:not(.is-active) {
+    background: #fafafa;
+  }
+
+  &.is-active {
+    background: #e6f4ff;
+    box-shadow: inset 3px 0 0 #1677ff;
+  }
+}
+
+.candidate-list-item-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.candidate-list-item-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.candidate-list-item-title {
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+  line-height: 1.4;
+}
+
+.candidate-list-item-meta {
+  margin-top: 2px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.candidate-detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.candidate-detail-name {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.candidate-detail-sub {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.candidate-score-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 24px;
+  margin-bottom: 20px;
+}
+
+.candidate-score-item-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.candidate-note-block {
+  padding: 12px 14px;
+  background: #fafafa;
+  border-radius: 8px;
+  border: 1px solid #f0f0f0;
+  margin-bottom: 12px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.candidate-note-block-title {
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.candidate-overview-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.candidate-stat-card {
+  padding: 12px 14px;
+  background: #fafafa;
+  border-radius: 8px;
+  border: 1px solid #f0f0f0;
+}
+
+.candidate-stat-value {
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.candidate-stat-label {
+  margin-top: 4px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.candidate-overview-section {
+  padding: 16px 20px 20px;
+}
+
+.candidate-schedule-row {
+  display: grid;
+  grid-template-columns: 72px 1fr 88px 72px;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f5f5f5;
+  font-size: 13px;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.candidate-schedule-time {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.demo-panel-hint {
+  margin: 0;
+  padding: 10px 16px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+  background: #fffbe6;
+  border-bottom: 1px solid #ffe58f;
+}
+
+.demo-job-preview {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #f0f0f0;
+  background: #fff;
+}
+
+.demo-job-preview-header {
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #f6ffed 0%, #fff 100%);
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.demo-job-preview-body {
+  padding: 16px 20px;
+  color: rgba(0, 0, 0, 0.65);
+  line-height: 1.7;
+}
