@@ -40,8 +40,9 @@ npm i --save @kne/react-modal
 #### 示例样式
 
 ```scss
-/* 示例业务 UI（布局滚动等仍用 @kne/react-modal/dist/index.css） */
-
+/* 示例业务 UI（布局滚动等仍用 @kne/react-modal/dist/index.css）
+ * Modal/Drawer 挂到 body，demo 类名须 @at-root 逃出 md-doc scope 包裹 */
+@at-root {
 .candidate-list-toolbar {
   display: flex;
   flex-direction: column;
@@ -222,6 +223,7 @@ npm i --save @kne/react-modal
   color: rgba(0, 0, 0, 0.65);
   line-height: 1.7;
 }
+}
 ```
 
 #### 示例代码
@@ -313,7 +315,7 @@ render(
 
 - footerButtons 与尺寸
 - Modal / Drawer 切换：size / footerButtons / 左侧 footer 插槽 / noPadding 预览
-- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),(@kne/current-lib_react-modal/doc/style.scss),antd(antd)
+- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),antd(antd)
 
 ```jsx
 const { default: Modal, Drawer, DrawerContextHolder } = _ReactModal;
@@ -1203,7 +1205,7 @@ render(
 
 - 批量候选人评估（Tabs + 分栏）
 - Modal / Drawer 切换：Tabs 分栏 / Splitter / 批次概览
-- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),antd(antd),(@kne/current-lib_react-modal/doc/style.scss)
+- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),antd(antd)
 
 ```jsx
 const {
