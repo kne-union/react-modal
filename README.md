@@ -40,8 +40,9 @@ npm i --save @kne/react-modal
 #### 示例样式
 
 ```scss
-/* 示例业务 UI（布局滚动等仍用 @kne/react-modal/dist/index.css） */
-
+/* 示例业务 UI（布局滚动等仍用 @kne/react-modal/dist/index.css）
+ * Modal/Drawer 挂到 body，demo 类名须 @at-root 逃出 md-doc scope 包裹 */
+@at-root {
 .candidate-list-toolbar {
   display: flex;
   flex-direction: column;
@@ -221,6 +222,7 @@ npm i --save @kne/react-modal
   padding: 16px 20px;
   color: rgba(0, 0, 0, 0.65);
   line-height: 1.7;
+}
 }
 ```
 
