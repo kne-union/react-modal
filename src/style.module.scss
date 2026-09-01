@@ -242,6 +242,29 @@
   pointer-events: none;
 }
 
+.modal-form-host {
+  :global(.ant-modal-body) {
+    :global(.react-form--inner) {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      min-height: 0;
+      width: 100%;
+    }
+
+    :global(.react-form--inner) > :global(.ant-flex) {
+      flex: 1 1 auto;
+      min-height: 0;
+      width: 100%;
+    }
+  }
+
+  .modal-outer {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
 :global(.ant-modal-root) .modal-wrap:global(.ant-modal-wrap) {
   overflow: hidden;
 }
