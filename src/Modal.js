@@ -358,16 +358,35 @@ export const useModal = () => {
     const { isMobile, fixedModeClass } = resolveMount(anchor);
     const unlock = lockParentScroll(getScrollElement);
     const api = {};
-    const { afterClose: userAfterClose, getContainer: customGetContainer, ...restProps } = props;
+    const { afterClose: userAfterClose, getContainer: customGetContainer, onClose: userOnClose, onConfirm: userOnConfirm, onCancel: userOnCancel, ...restProps } = props;
+
+    const closeModal = () => {
+      api.close?.();
+    };
+
     const { children, getContainer, afterClose, ...otherProps } = computedCommonProps({
-      onClose: () => api.close(),
+      ...restProps,
       isMobile,
       fixedModeClass,
+      onClose: () => {
+        userOnClose?.();
+        closeModal();
+      },
+      onCancel: (...args) => {
+        userOnCancel?.(...args);
+        closeModal();
+      },
+      onConfirm: async (...args) => {
+        const res = await Promise.resolve(userOnConfirm?.(...args));
+        if (res !== false) {
+          closeModal();
+        }
+        return res;
+      },
       afterClose: (...args) => {
         unlock();
-        userAfterClose && userAfterClose(...args);
-      },
-      ...restProps
+        userAfterClose?.(...args);
+      }
     });
     const { destroy } = modal.info({
       ...otherProps,

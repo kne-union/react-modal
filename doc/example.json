@@ -135,6 +135,25 @@
       ]
     },
     {
+      "title": "高度受限 · 居中弹窗",
+      "description": "kne-modal-height-limited 压低 body 高度；声明式 / useModal 对比居中与 confirm-paragraph 宽度",
+      "code": "./limited-height.js",
+      "scope": [
+        {
+          "name": "_ReactModal",
+          "packageName": "@kne/current-lib_react-modal",
+          "importStatement": "import * as _ReactModal from \"@kne/react-modal\""
+        },
+        {
+          "packageName": "@kne/current-lib_react-modal/dist/index.css"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
       "title": "批量候选人评估（Tabs + 分栏）",
       "description": "Modal / Drawer 切换：Tabs 分栏 / Splitter / 批次概览",
       "code": "./extend-layout.js",

@@ -134,10 +134,9 @@ const mapConfirmProps = (props, { isMobile, fixedModeClass, getPopupContainer, a
       classNames: {
         mask: classnames(isMobile && modalStyle['modal-mask-fullscreen'], isMobile && fixedModeClass, otherProps.classNames?.mask)
       },
-      wrapClassName: classnames(modalStyle['modal-wrap'], confirmStyle['confirm-modal-wrap'], wrapClassName, {
+      wrapClassName: classnames(modalStyle['modal-wrap'], modalStyle['modal-wrap-centered'], confirmStyle['confirm-modal-wrap'], wrapClassName, {
         [confirmStyle['is-danger']]: danger,
         [confirmStyle['is-mobile']]: isMobile,
-        [modalStyle['modal-wrap-centered']]: isMobile,
         [fixedModeClass]: isMobile
       }),
       title: confirmTitle ? <ConfirmLocaleRoot>{confirmTitle}</ConfirmLocaleRoot> : null,
