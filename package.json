@@ -1,6 +1,6 @@
 {
   "name": "@kne/react-modal",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "基于 antd 的 React 弹层组件，提供 Modal/Drawer、useModal/useDrawer/useConfirmModal、共用 TabsLayout/ScrollRegion 布局与 createModalRender/createDrawerRender支持 SimpleBar 与移动端适配。",
   "syntax": {
     "esmodules": true
