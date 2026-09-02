@@ -267,6 +267,19 @@
 
 :global(.ant-modal-root) .modal-wrap:global(.ant-modal-wrap) {
   overflow: hidden;
+
+  /* useModal 走 modal.info()，antd 会给内容包 .ant-modal-confirm-paragraph 并扣 12px 宽 */
+  :global(.ant-modal-confirm-paragraph) {
+    max-width: 100% !important;
+  }
+}
+
+/* 测试用：明显压低 body 可用高度，便于验证滚动与居中 */
+.modal:global(.kne-modal-height-limited) {
+  --kne-modal-viewport-gutter: 360px;
+  --kne-modal-body-max-height: 420px;
+  --kne-modal-body-height: min(420px, calc(var(--kne-modal-viewport-height) - var(--kne-modal-title-height) - var(--kne-modal-footer-height) - var(--kne-modal-viewport-gutter)));
+  --kne-modal-content-height: calc(var(--kne-modal-body-height) - var(--kne-modal-body-padding-vertical));
 }
 
 .modal-wrap-centered:global(.ant-modal-wrap) {
