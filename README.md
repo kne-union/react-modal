@@ -4,7 +4,7 @@
 
 ### 描述
 
-基于 antd 的 React 弹层组件，提供 Modal/Drawer、useModal/useDrawer/useConfirmModal、共用 TabsLayout/ScrollRegion 布局与 createModalRender/createDrawerRender，支持 SimpleBar 与移动端适配。
+基于 antd 的 React 弹层组件，提供 Modal/Drawer、useModal/useDrawer/useConfirmModal、共用 TabsLayout/ScrollRegion 布局与 createModalRender/createDrawerRender支持 SimpleBar 与移动端适配。
 
 ### 关键词
 
@@ -224,6 +224,27 @@ npm i --save @kne/react-modal
   padding: 16px 20px;
   color: rgba(0, 0, 0, 0.65);
   line-height: 1.7;
+}
+
+.demo-modal-height-limited-panel {
+  min-height: 100%;
+  box-sizing: border-box;
+  padding: 12px 16px;
+  background: linear-gradient(180deg, #fff7e6 0%, #fff 48px);
+  border: 2px dashed #fa8c16;
+  border-radius: 6px;
+}
+
+.demo-modal-height-limited-panel-title {
+  margin: 0 0 8px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.demo-modal-height-limited-line {
+  margin: 6px 0;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
 }
 }
 ```
@@ -1200,6 +1221,97 @@ render(
   <App>
     <DrawerContextHolder />
     <ChromeHeightExample />
+  </App>
+);
+
+```
+
+- 高度受限 · 居中弹窗
+- kne-modal-height-limited 压低 body 高度；声明式 / useModal 对比居中与 confirm-paragraph 宽度
+- _ReactModal(@kne/current-lib_react-modal)[import * as _ReactModal from "@kne/react-modal"],(@kne/current-lib_react-modal/dist/index.css),antd(antd)
+
+```jsx
+const { default: Modal, useModal, DrawerContextHolder } = _ReactModal;
+const { Button, Space, Radio, Typography, App } = antd;
+const { useState } = React;
+
+const { Text, Paragraph } = Typography;
+
+const fillLines = Array.from({ length: 20 }, (_, i) => &#96;填充行 ${i + 1} · 用于观察高度受限时 body 内滚动&#96;);
+
+const LimitedHeightExample = () => {
+  const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState('declarative');
+  const modal = useModal();
+
+  const content = (
+    <div className="demo-modal-height-limited-panel">
+      <p className="demo-modal-height-limited-panel-title">高度受限弹窗（kne-modal-height-limited）</p>
+      <Paragraph type="secondary" style={{ marginBottom: 12 }}>
+        默认从视口垂直居中弹出；body 高度被 CSS 变量压到约 420px，长内容在 SimpleBar 内滚动。
+      </Paragraph>
+      {fillLines.map(text => (
+        <p key={text} className="demo-modal-height-limited-line">
+          {text}
+        </p>
+      ))}
+    </div>
+  );
+
+  const overlayProps = {
+    title: '高度受限 · 居中弹窗',
+    className: 'kne-modal-height-limited',
+    onClose: () => setOpen(false),
+    onConfirm: () => setOpen(false),
+    confirmText: '知道了'
+  };
+
+  return (
+    <Space direction="vertical" style={{ width: '100%' }} size="middle">
+      <Space align="center" wrap>
+        <Text type="secondary">打开方式</Text>
+        <Radio.Group
+          value={mode}
+          optionType="button"
+          size="small"
+          options={[
+            { label: '声明式 Modal', value: 'declarative' },
+            { label: 'useModal（info）', value: 'imperative' }
+          ]}
+          onChange={e => setMode(e.target.value)}
+        />
+      </Space>
+      <Button
+        type="primary"
+        onClick={() => {
+          if (mode === 'imperative') {
+            modal({
+              ...overlayProps,
+              children: content
+            });
+            return;
+          }
+          setOpen(true);
+        }}
+      >
+        打开高度受限弹窗
+      </Button>
+      <Text type="secondary">
+        useModal 走 antd modal.info，已覆盖 <code>.ant-modal-confirm-paragraph</code> 的 12px 宽度扣减。
+      </Text>
+      {mode === 'declarative' ? (
+        <Modal {...overlayProps} open={open}>
+          {content}
+        </Modal>
+      ) : null}
+    </Space>
+  );
+};
+
+render(
+  <App>
+    <DrawerContextHolder />
+    <LimitedHeightExample />
   </App>
 );
 
