@@ -72,9 +72,15 @@ let parentScrollLocked = [];
 export const lockParentScroll = getScrollElement => {
   parentScrollLockCount += 1;
   if (parentScrollLockCount === 1) {
-    const targets = [document.body];
+    const targets = [];
+    if (typeof document !== 'undefined') {
+      targets.push(document.body);
+      if (document.documentElement) {
+        targets.push(document.documentElement);
+      }
+    }
     const scrollEl = typeof getScrollElement === 'function' ? getScrollElement() : null;
-    if (scrollEl && scrollEl !== document.body && !targets.includes(scrollEl)) {
+    if (scrollEl && !targets.includes(scrollEl)) {
       targets.push(scrollEl);
     }
     parentScrollLocked = targets.map(el => {

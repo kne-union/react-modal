@@ -325,6 +325,15 @@
 }
 
 .drawer-root-mobile:global(.ant-drawer) {
+  // 与 Modal .modal-wrap-fullscreen 一致：拦住背后页面的触摸滚动穿透
+  overscroll-behavior: none;
+  touch-action: none;
+
+  :global(.ant-drawer-content-wrapper),
+  :global(.ant-drawer-content) {
+    touch-action: auto;
+  }
+
   :global(.ant-drawer-content) {
     width: 100%;
     max-width: 100%;
@@ -350,11 +359,15 @@
   inset: 0 !important;
   width: 100% !important;
   height: 100% !important;
+  overscroll-behavior: none;
+  touch-action: none;
 }
 
 :global(.ant-drawer-mask.kne-is-viewport) {
   position: fixed !important;
   inset: 0 !important;
+  overscroll-behavior: none;
+  touch-action: none;
 }
 
 @include resp.mobile-container {
