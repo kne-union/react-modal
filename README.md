@@ -2,7 +2,7 @@
 
 ### 描述
 
-基于 antd 的 React 弹层组件，提供 Modal/Drawer、useModal/useDrawer/useConfirmModal、共用 TabsLayout/ScrollRegion 布局与 createModalRender/createDrawerRender，支持 SimpleBar 与移动端适配。
+基于 antd 的 React 弹层组件，提供 Modal/Drawer、useModal/useDrawer/useConfirmModal、共用 TabsLayout/ScrollRegion 布局与 createModalRender/createDrawerRender支持 SimpleBar 与移动端适配。
 
 ### 关键词
 

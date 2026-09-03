@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { Button, Drawer as AntdDrawer } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
-import { useMobilePopupMount, useScrollElement } from '@kne/responsive-utils';
+import { usePopupMount, useScrollElement } from '@kne/responsive-utils';
 import withLocale from './withLocale';
 import Footer from './Footer';
 import SimpleBar from './SimpleBar';
@@ -297,7 +297,7 @@ export const computedDrawerProps = ({
 
 const Drawer = withLocale(({ size = 'default', placement = 'right', getContainer, open, bodyScroll = true, ...props }) => {
   const hostRef = useRef(null);
-  const { isMobile, fixedModeClass, getPopupContainer, anchorRef } = useMobilePopupMount({
+  const { isMobile, fixedModeClass, getPopupContainer, anchorRef } = usePopupMount({
     ...boundaryPopupMountOptions,
     getPopupContainer: wrapCustomGetContainer(getContainer)
   });

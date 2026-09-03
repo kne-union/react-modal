@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { App, Button, Modal as AntdModal } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
-import { useMobilePopupMount, useScrollElement } from '@kne/responsive-utils';
+import { usePopupMount, useScrollElement, hoistOutOfModalRoot } from '@kne/responsive-utils';
 import withLocale from './withLocale';
 import Footer from './Footer';
 import SimpleBar from './SimpleBar';
@@ -34,17 +34,6 @@ const viewportPopupMountOptions = {
   exampleSelectors: VIEWPORT_EXAMPLE_SELECTORS
 };
 
-const findParentModalMountHost = node => {
-  if (!node || typeof node.closest !== 'function') {
-    return null;
-  }
-  const parentRoot = node.closest('.ant-modal-root');
-  if (!parentRoot) {
-    return null;
-  }
-  return parentRoot.parentElement || (typeof document !== 'undefined' ? document.body : null);
-};
-
 export const resolveModalGetContainer = ({ customGetContainer, getPopupContainer, getHostNode }) => {
   const wrappedCustom = wrapCustomGetContainer(customGetContainer);
   return triggerNode => {
@@ -55,7 +44,7 @@ export const resolveModalGetContainer = ({ customGetContainer, getPopupContainer
       }
     }
     const from = triggerNode || (typeof getHostNode === 'function' ? getHostNode() : null);
-    const nestedHost = findParentModalMountHost(from);
+    const nestedHost = hoistOutOfModalRoot(from);
     if (nestedHost) {
       return nestedHost;
     }
@@ -309,7 +298,7 @@ const computedCommonProps = ({
 
 const Modal = withLocale(({ size = 'default', getContainer, open, mobileFullscreen = true, bodyScroll = true, ...props }) => {
   const hostRef = useRef(null);
-  const { isMobile, fixedModeClass, getPopupContainer, anchorRef } = useMobilePopupMount({
+  const { isMobile, fixedModeClass, getPopupContainer, anchorRef } = usePopupMount({
     ...viewportPopupMountOptions,
     getPopupContainer: wrapCustomGetContainer(getContainer)
   });
@@ -350,7 +339,7 @@ const Modal = withLocale(({ size = 'default', getContainer, open, mobileFullscre
 
 export const useModal = () => {
   const { modal } = App.useApp();
-  const { resolveMount, getPopupContainer } = useMobilePopupMount(viewportPopupMountOptions);
+  const { resolveMount, getPopupContainer } = usePopupMount(viewportPopupMountOptions);
   const getScrollElement = useScrollElement();
 
   return props => {
