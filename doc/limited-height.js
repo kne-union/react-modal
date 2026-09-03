@@ -15,7 +15,7 @@ const LimitedHeightExample = () => {
     <div className="demo-modal-height-limited-panel">
       <p className="demo-modal-height-limited-panel-title">高度受限弹窗（kne-modal-height-limited）</p>
       <Paragraph type="secondary" style={{ marginBottom: 12 }}>
-        默认从视口垂直居中弹出；body 高度被 CSS 变量压到约 420px，长内容在 SimpleBar 内滚动。
+        默认从视口垂直居中弹出；body 高度被 CSS 变量压到约 420px，长内容在 SimpleBar 内滚动。移动端仍保持居中卡片，footer 贴在卡片底部（不走全屏）。
       </Paragraph>
       {fillLines.map(text => (
         <p key={text} className="demo-modal-height-limited-line">

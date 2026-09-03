@@ -77,7 +77,7 @@ const sizeStyleVars = (size, hasFooter) => {
   };
 };
 
-const ModalOuter = ({ title, footer, footerButtons, noPadding, onClose, closable, onConfirm, onCancel, children, targetProps, cancelText, confirmText, isMobile, bodyScroll }) => {
+const ModalOuter = ({ title, footer, footerButtons, noPadding, onClose, closable, onConfirm, onCancel, children, targetProps, cancelText, confirmText, isMobile, useMobileLayout, bodyScroll }) => {
   const effectiveNoPadding = noPadding ?? bodyScroll === false;
   const bodyInner = (
     <div
@@ -94,7 +94,8 @@ const ModalOuter = ({ title, footer, footerButtons, noPadding, onClose, closable
   return (
     <div
       className={classnames(style['modal-outer'], 'modal-container', {
-        [style['is-mobile']]: isMobile,
+        // 全屏布局才上 is-mobile；高度受限居中时保持卡片高度，footer 贴卡片底
+        [style['is-mobile']]: useMobileLayout,
         [style['no-title']]: !title,
         [style['no-footer']]: footer === null && footerButtons === undefined,
         [style['no-padding']]: effectiveNoPadding
@@ -128,6 +129,14 @@ const ModalOuter = ({ title, footer, footerButtons, noPadding, onClose, closable
   );
 };
 
+const isHeightLimitedClass = className => {
+  if (!className) {
+    return false;
+  }
+  const list = typeof className === 'string' ? className.split(/\s+/) : [].concat(className);
+  return list.some(name => name === 'kne-modal-height-limited');
+};
+
 const computedCommonProps = ({
   children,
   footer,
@@ -153,7 +162,9 @@ const computedCommonProps = ({
   modalRender,
   ...props
 }) => {
-  const useMobileLayout = isMobile && mobileFullscreen !== false;
+  // 高度受限示例要保持「居中卡片」，移动端也不走全屏，否则 body 被压矮后 footer 悬在中间
+  const heightLimited = isHeightLimitedClass(className);
+  const useMobileLayout = isMobile && mobileFullscreen !== false && !heightLimited;
   const hasFooter = !(footer === null && footerButtons === undefined);
   const sizeVars = sizeStyleVars(size, hasFooter);
   const { width, ...cssVars } = sizeVars;
@@ -173,7 +184,8 @@ const computedCommonProps = ({
         noPadding={noPadding}
         footer={renderWithOptions(footer, opts)}
         targetProps={opts}
-        isMobile={useMobileLayout}
+        isMobile={isMobile}
+        useMobileLayout={useMobileLayout}
         bodyScroll={bodyScroll}
       >
         {renderWithOptions(children, opts)}
