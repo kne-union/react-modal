@@ -1,6 +1,6 @@
 {
   "name": "@kne/react-modal",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "基于 antd 的 React 弹层组件，提供 Modal/Drawer、useModal/useDrawer/useConfirmModal、共用 TabsLayout/ScrollRegion 布局与 createModalRender/createDrawerRender支持 SimpleBar 与移动端适配。",
   "syntax": {
     "esmodules": true
@@ -108,7 +108,7 @@
     "@ant-design/icons": "^6.3.4",
     "@kne/button-group": "^0.1.41",
     "@kne/react-intl": "^0.1.9",
-    "@kne/responsive-utils": "^0.1.15",
+    "@kne/responsive-utils": "^0.1.16",
     "classnames": "^2.5.1",
     "simplebar": "^6.3.3",
     "simplebar-react": "^3.3.2"

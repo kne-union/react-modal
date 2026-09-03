@@ -325,6 +325,22 @@
 }
 
 .drawer-root-mobile:global(.ant-drawer) {
+  // 对齐 Modal .modal-wrap-fullscreen：全屏层挡住背后滚动
+  display: block;
+  inset: 0 !important;
+  width: var(--kne-viewport-width, 100vw) !important;
+  height: var(--kne-viewport-height, 100vh) !important;
+  max-height: var(--kne-viewport-height, 100vh) !important;
+  box-sizing: border-box;
+  overflow: hidden !important;
+  overscroll-behavior: none;
+  touch-action: none;
+
+  :global(.ant-drawer-content-wrapper),
+  :global(.ant-drawer-content) {
+    touch-action: auto;
+  }
+
   :global(.ant-drawer-content) {
     width: 100%;
     max-width: 100%;
@@ -335,9 +351,10 @@
 
   &:global(.kne-is-boundary) {
     position: absolute !important;
-    inset: 0 !important;
     width: 100% !important;
     height: 100% !important;
+    min-height: 100% !important;
+    max-height: 100% !important;
   }
 
   &:global(.kne-is-viewport) {

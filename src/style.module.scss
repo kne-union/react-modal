@@ -111,10 +111,13 @@
     .modal-body {
       flex: 1 1 auto;
       min-height: 0;
+      height: auto !important;
+      max-height: none !important;
     }
 
     .modal-footer {
       flex: none;
+      margin-top: auto;
     }
   }
 }

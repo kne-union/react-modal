@@ -1,7 +1,7 @@
 import { App } from 'antd';
 import { CheckCircleFilled, CloseCircleFilled, ExclamationCircleFilled, InfoCircleFilled } from '@ant-design/icons';
 import classnames from 'classnames';
-import { useMobilePopupMount, useScrollElement } from '@kne/responsive-utils';
+import { usePopupMount, useScrollElement } from '@kne/responsive-utils';
 import withLocale from './withLocale';
 import { lockParentScroll, resolveModalGetContainer } from './Modal';
 import modalStyle from './style.module.scss';
@@ -147,7 +147,7 @@ const mapConfirmProps = (props, { isMobile, fixedModeClass, getPopupContainer, a
 
 export const useConfirmModal = () => {
   const { modal } = App.useApp();
-  const { resolveMount, getPopupContainer } = useMobilePopupMount(viewportPopupMountOptions);
+  const { resolveMount, getPopupContainer } = usePopupMount(viewportPopupMountOptions);
   const getScrollElement = useScrollElement();
 
   return props => {

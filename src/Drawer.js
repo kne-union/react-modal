@@ -1,19 +1,23 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { Button, Drawer as AntdDrawer } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
-import { useMobilePopupMount, useScrollElement } from '@kne/responsive-utils';
+import { usePopupMount, useScrollElement } from '@kne/responsive-utils';
 import withLocale from './withLocale';
 import Footer from './Footer';
 import SimpleBar from './SimpleBar';
+import { lockParentScroll, useLockParentScroll } from './lockParentScroll';
 import style from './drawer.module.scss';
+
+export { lockParentScroll } from './lockParentScroll';
 
 const DrawerLocaleRoot = withLocale(({ children }) => children);
 
 const VIEWPORT_EXAMPLE_SELECTORS = ['.example-driver-device-scroll'];
 
-const boundaryPopupMountOptions = {
-  cover: 'boundary',
+// 与 Modal 一致：真机挂 body+fixed；示例框 / container 模式仍走 boundary（usePopupMount 内判定）
+const viewportPopupMountOptions = {
+  cover: 'viewport',
   exampleSelectors: VIEWPORT_EXAMPLE_SELECTORS
 };
 
@@ -63,48 +67,6 @@ export const resolveDrawerGetContainer = ({ customGetContainer, getPopupContaine
     }
     return getPopupContainer(triggerNode);
   };
-};
-
-let parentScrollLockCount = 0;
-let parentScrollLocked = [];
-
-export const lockParentScroll = getScrollElement => {
-  parentScrollLockCount += 1;
-  if (parentScrollLockCount === 1) {
-    const targets = [document.body];
-    const scrollEl = typeof getScrollElement === 'function' ? getScrollElement() : null;
-    if (scrollEl && scrollEl !== document.body && !targets.includes(scrollEl)) {
-      targets.push(scrollEl);
-    }
-    parentScrollLocked = targets.map(el => {
-      const prev = {
-        overflow: el.style.overflow,
-        overscrollBehavior: el.style.overscrollBehavior
-      };
-      el.style.overflow = 'hidden';
-      el.style.overscrollBehavior = 'none';
-      return { el, prev };
-    });
-  }
-  return () => {
-    parentScrollLockCount = Math.max(0, parentScrollLockCount - 1);
-    if (parentScrollLockCount === 0) {
-      parentScrollLocked.forEach(({ el, prev }) => {
-        el.style.overflow = prev.overflow;
-        el.style.overscrollBehavior = prev.overscrollBehavior;
-      });
-      parentScrollLocked = [];
-    }
-  };
-};
-
-const useLockParentScroll = (enabled, getScrollElement) => {
-  useEffect(() => {
-    if (!enabled) {
-      return undefined;
-    }
-    return lockParentScroll(getScrollElement);
-  }, [enabled, getScrollElement]);
 };
 
 const sizeStyleVars = (size, hasFooter) => {
@@ -297,8 +259,8 @@ export const computedDrawerProps = ({
 
 const Drawer = withLocale(({ size = 'default', placement = 'right', getContainer, open, bodyScroll = true, ...props }) => {
   const hostRef = useRef(null);
-  const { isMobile, fixedModeClass, getPopupContainer, anchorRef } = useMobilePopupMount({
-    ...boundaryPopupMountOptions,
+  const { isMobile, fixedModeClass, getPopupContainer, anchorRef } = usePopupMount({
+    ...viewportPopupMountOptions,
     getPopupContainer: wrapCustomGetContainer(getContainer)
   });
   const getScrollElement = useScrollElement();

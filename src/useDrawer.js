@@ -1,13 +1,14 @@
 import { createRef, forwardRef, memo, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Drawer as AntdDrawer } from 'antd';
-import { useMobilePopupMount, useScrollElement } from '@kne/responsive-utils';
+import { usePopupMount, useScrollElement } from '@kne/responsive-utils';
 import { computedDrawerProps, lockParentScroll, resolveDrawerGetContainer } from './Drawer';
 import usePatchElement from './usePatchElement';
 
 const VIEWPORT_EXAMPLE_SELECTORS = ['.example-driver-device-scroll'];
 
-const boundaryPopupMountOptions = {
-  cover: 'boundary',
+// 与 Modal / Drawer 一致：真机 viewport；示例框 / container 仍 boundary
+const viewportPopupMountOptions = {
+  cover: 'viewport',
   exampleSelectors: VIEWPORT_EXAMPLE_SELECTORS
 };
 
@@ -29,8 +30,8 @@ const HookDrawer = forwardRef(({ config, afterClose: hookAfterClose }, ref) => {
   const [open, setOpen] = useState(true);
   const [innerConfig, setInnerConfig] = useState(config);
   const hostRef = useRef(null);
-  const { getPopupContainer, anchorRef } = useMobilePopupMount({
-    ...boundaryPopupMountOptions,
+  const { getPopupContainer, anchorRef } = usePopupMount({
+    ...viewportPopupMountOptions,
     getPopupContainer: wrapCustomGetContainer(innerConfig.getContainer)
   });
 
@@ -89,7 +90,7 @@ const ElementsHolder = memo(
 const useDrawerHolder = () => {
   const holderRef = useRef(null);
   const [actionQueue, setActionQueue] = useState([]);
-  const { resolveMount, getPopupContainer } = useMobilePopupMount(boundaryPopupMountOptions);
+  const { resolveMount, getPopupContainer } = usePopupMount(viewportPopupMountOptions);
   const getScrollElement = useScrollElement();
 
   useEffect(() => {

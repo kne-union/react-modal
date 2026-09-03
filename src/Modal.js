@@ -1,12 +1,15 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { App, Button, Modal as AntdModal } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
-import { useMobilePopupMount, useScrollElement } from '@kne/responsive-utils';
+import { usePopupMount, useScrollElement, hoistOutOfModalRoot } from '@kne/responsive-utils';
 import withLocale from './withLocale';
 import Footer from './Footer';
 import SimpleBar from './SimpleBar';
+import { lockParentScroll, useLockParentScroll } from './lockParentScroll';
 import style from './style.module.scss';
+
+export { lockParentScroll } from './lockParentScroll';
 
 const ModalLocaleRoot = withLocale(({ children }) => children);
 
@@ -34,17 +37,6 @@ const viewportPopupMountOptions = {
   exampleSelectors: VIEWPORT_EXAMPLE_SELECTORS
 };
 
-const findParentModalMountHost = node => {
-  if (!node || typeof node.closest !== 'function') {
-    return null;
-  }
-  const parentRoot = node.closest('.ant-modal-root');
-  if (!parentRoot) {
-    return null;
-  }
-  return parentRoot.parentElement || (typeof document !== 'undefined' ? document.body : null);
-};
-
 export const resolveModalGetContainer = ({ customGetContainer, getPopupContainer, getHostNode }) => {
   const wrappedCustom = wrapCustomGetContainer(customGetContainer);
   return triggerNode => {
@@ -55,54 +47,12 @@ export const resolveModalGetContainer = ({ customGetContainer, getPopupContainer
       }
     }
     const from = triggerNode || (typeof getHostNode === 'function' ? getHostNode() : null);
-    const nestedHost = findParentModalMountHost(from);
+    const nestedHost = hoistOutOfModalRoot(from);
     if (nestedHost) {
       return nestedHost;
     }
     return getPopupContainer(triggerNode);
   };
-};
-
-let parentScrollLockCount = 0;
-let parentScrollLocked = [];
-
-export const lockParentScroll = getScrollElement => {
-  parentScrollLockCount += 1;
-  if (parentScrollLockCount === 1) {
-    const targets = [document.body];
-    const scrollEl = typeof getScrollElement === 'function' ? getScrollElement() : null;
-    if (scrollEl && scrollEl !== document.body && !targets.includes(scrollEl)) {
-      targets.push(scrollEl);
-    }
-    parentScrollLocked = targets.map(el => {
-      const prev = {
-        overflow: el.style.overflow,
-        overscrollBehavior: el.style.overscrollBehavior
-      };
-      el.style.overflow = 'hidden';
-      el.style.overscrollBehavior = 'none';
-      return { el, prev };
-    });
-  }
-  return () => {
-    parentScrollLockCount = Math.max(0, parentScrollLockCount - 1);
-    if (parentScrollLockCount === 0) {
-      parentScrollLocked.forEach(({ el, prev }) => {
-        el.style.overflow = prev.overflow;
-        el.style.overscrollBehavior = prev.overscrollBehavior;
-      });
-      parentScrollLocked = [];
-    }
-  };
-};
-
-const useLockParentScroll = (enabled, getScrollElement) => {
-  useEffect(() => {
-    if (!enabled) {
-      return undefined;
-    }
-    return lockParentScroll(getScrollElement);
-  }, [enabled, getScrollElement]);
 };
 
 const sizeStyleVars = (size, hasFooter) => {
@@ -140,6 +90,9 @@ const ModalOuter = ({ title, footer, footerButtons, noPadding, onClose, closable
   );
 
   const bodyClassName = classnames(style['modal-body'], 'modal-body');
+  // 移动端全屏：body 用 flex 吃满 title/footer 之间剩余高度，footer 才能贴底；
+  // 勿写死 --kne-modal-body-height（高度受限类会把该值压矮，footer 悬在中间）
+  const bodyStyle = isMobile ? { flex: '1 1 auto', minHeight: 0, height: 'auto' } : { height: 'var(--kne-modal-body-height)' };
 
   return (
     <div
@@ -165,11 +118,13 @@ const ModalOuter = ({ title, footer, footerButtons, noPadding, onClose, closable
       )}
       {title ? <div className={classnames(style['modal-title'], 'modal-title')}>{title}</div> : null}
       {bodyScroll !== false ? (
-        <SimpleBar className={bodyClassName} style={{ height: 'var(--kne-modal-body-height)' }}>
+        <SimpleBar className={bodyClassName} style={bodyStyle}>
           {bodyInner}
         </SimpleBar>
       ) : (
-        <div className={classnames(bodyClassName, style['body-scroll-off'])}>{bodyInner}</div>
+        <div className={classnames(bodyClassName, style['body-scroll-off'])} style={isMobile ? { flex: '1 1 auto', minHeight: 0 } : undefined}>
+          {bodyInner}
+        </div>
       )}
       {footer === null && footerButtons === undefined ? null : (
         <Footer footer={footer} footerButtons={footerButtons} onConfirm={onConfirm} confirmText={confirmText} onCancel={onCancel} cancelText={cancelText} onClose={onClose} targetProps={targetProps} isMobile={isMobile} />
@@ -309,7 +264,7 @@ const computedCommonProps = ({
 
 const Modal = withLocale(({ size = 'default', getContainer, open, mobileFullscreen = true, bodyScroll = true, ...props }) => {
   const hostRef = useRef(null);
-  const { isMobile, fixedModeClass, getPopupContainer, anchorRef } = useMobilePopupMount({
+  const { isMobile, fixedModeClass, getPopupContainer, anchorRef } = usePopupMount({
     ...viewportPopupMountOptions,
     getPopupContainer: wrapCustomGetContainer(getContainer)
   });
@@ -350,7 +305,7 @@ const Modal = withLocale(({ size = 'default', getContainer, open, mobileFullscre
 
 export const useModal = () => {
   const { modal } = App.useApp();
-  const { resolveMount, getPopupContainer } = useMobilePopupMount(viewportPopupMountOptions);
+  const { resolveMount, getPopupContainer } = usePopupMount(viewportPopupMountOptions);
   const getScrollElement = useScrollElement();
 
   return props => {
