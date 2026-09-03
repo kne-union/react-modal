@@ -6,8 +6,9 @@ import usePatchElement from './usePatchElement';
 
 const VIEWPORT_EXAMPLE_SELECTORS = ['.example-driver-device-scroll'];
 
-const boundaryPopupMountOptions = {
-  cover: 'boundary',
+// 与 Modal / Drawer 一致：真机 viewport；示例框 / container 仍 boundary
+const viewportPopupMountOptions = {
+  cover: 'viewport',
   exampleSelectors: VIEWPORT_EXAMPLE_SELECTORS
 };
 
@@ -30,7 +31,7 @@ const HookDrawer = forwardRef(({ config, afterClose: hookAfterClose }, ref) => {
   const [innerConfig, setInnerConfig] = useState(config);
   const hostRef = useRef(null);
   const { getPopupContainer, anchorRef } = usePopupMount({
-    ...boundaryPopupMountOptions,
+    ...viewportPopupMountOptions,
     getPopupContainer: wrapCustomGetContainer(innerConfig.getContainer)
   });
 
@@ -89,7 +90,7 @@ const ElementsHolder = memo(
 const useDrawerHolder = () => {
   const holderRef = useRef(null);
   const [actionQueue, setActionQueue] = useState([]);
-  const { resolveMount, getPopupContainer } = usePopupMount(boundaryPopupMountOptions);
+  const { resolveMount, getPopupContainer } = usePopupMount(viewportPopupMountOptions);
   const getScrollElement = useScrollElement();
 
   useEffect(() => {

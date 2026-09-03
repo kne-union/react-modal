@@ -12,8 +12,9 @@ const DrawerLocaleRoot = withLocale(({ children }) => children);
 
 const VIEWPORT_EXAMPLE_SELECTORS = ['.example-driver-device-scroll'];
 
-const boundaryPopupMountOptions = {
-  cover: 'boundary',
+// 与 Modal 一致：真机挂 body+fixed；示例框 / container 模式仍走 boundary（usePopupMount 内判定）
+const viewportPopupMountOptions = {
+  cover: 'viewport',
   exampleSelectors: VIEWPORT_EXAMPLE_SELECTORS
 };
 
@@ -298,7 +299,7 @@ export const computedDrawerProps = ({
 const Drawer = withLocale(({ size = 'default', placement = 'right', getContainer, open, bodyScroll = true, ...props }) => {
   const hostRef = useRef(null);
   const { isMobile, fixedModeClass, getPopupContainer, anchorRef } = usePopupMount({
-    ...boundaryPopupMountOptions,
+    ...viewportPopupMountOptions,
     getPopupContainer: wrapCustomGetContainer(getContainer)
   });
   const getScrollElement = useScrollElement();
