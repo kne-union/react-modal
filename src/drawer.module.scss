@@ -325,7 +325,14 @@
 }
 
 .drawer-root-mobile:global(.ant-drawer) {
-  // 与 Modal .modal-wrap-fullscreen 一致：拦住背后页面的触摸滚动穿透
+  // 对齐 Modal .modal-wrap-fullscreen：全屏层挡住背后滚动
+  display: block;
+  inset: 0 !important;
+  width: var(--kne-viewport-width, 100vw) !important;
+  height: var(--kne-viewport-height, 100vh) !important;
+  max-height: var(--kne-viewport-height, 100vh) !important;
+  box-sizing: border-box;
+  overflow: hidden !important;
   overscroll-behavior: none;
   touch-action: none;
 
@@ -344,9 +351,10 @@
 
   &:global(.kne-is-boundary) {
     position: absolute !important;
-    inset: 0 !important;
     width: 100% !important;
     height: 100% !important;
+    min-height: 100% !important;
+    max-height: 100% !important;
   }
 
   &:global(.kne-is-viewport) {
@@ -359,15 +367,11 @@
   inset: 0 !important;
   width: 100% !important;
   height: 100% !important;
-  overscroll-behavior: none;
-  touch-action: none;
 }
 
 :global(.ant-drawer-mask.kne-is-viewport) {
   position: fixed !important;
   inset: 0 !important;
-  overscroll-behavior: none;
-  touch-action: none;
 }
 
 @include resp.mobile-container {

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { Button, Drawer as AntdDrawer } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
@@ -6,7 +6,10 @@ import { usePopupMount, useScrollElement } from '@kne/responsive-utils';
 import withLocale from './withLocale';
 import Footer from './Footer';
 import SimpleBar from './SimpleBar';
+import { lockParentScroll, useLockParentScroll } from './lockParentScroll';
 import style from './drawer.module.scss';
+
+export { lockParentScroll } from './lockParentScroll';
 
 const DrawerLocaleRoot = withLocale(({ children }) => children);
 
@@ -64,63 +67,6 @@ export const resolveDrawerGetContainer = ({ customGetContainer, getPopupContaine
     }
     return getPopupContainer(triggerNode);
   };
-};
-
-let parentScrollLockCount = 0;
-let parentScrollLocked = [];
-
-export const lockParentScroll = getScrollElement => {
-  parentScrollLockCount += 1;
-  if (parentScrollLockCount === 1) {
-    // 与 Modal 一致：只锁 body + layout scroll；勿强行锁 documentElement（overflow:hidden 会把页面滚回顶部）
-    const targets = [document.body];
-    const scrollEl = typeof getScrollElement === 'function' ? getScrollElement() : null;
-    if (scrollEl && scrollEl !== document.body && !targets.includes(scrollEl)) {
-      targets.push(scrollEl);
-    }
-    const windowScrollY = typeof window !== 'undefined' ? window.scrollY : 0;
-    parentScrollLocked = targets.map(el => {
-      const prev = {
-        overflow: el.style.overflow,
-        overscrollBehavior: el.style.overscrollBehavior,
-        scrollTop: el.scrollTop
-      };
-      el.style.overflow = 'hidden';
-      el.style.overscrollBehavior = 'none';
-      if (typeof el.scrollTop === 'number') {
-        el.scrollTop = prev.scrollTop;
-      }
-      return { el, prev };
-    });
-    if (typeof window !== 'undefined' && window.scrollY !== windowScrollY) {
-      window.scrollTo(0, windowScrollY);
-    }
-  }
-  return () => {
-    parentScrollLockCount = Math.max(0, parentScrollLockCount - 1);
-    if (parentScrollLockCount === 0) {
-      parentScrollLocked.forEach(({ el, prev }) => {
-        el.style.overflow = prev.overflow;
-        el.style.overscrollBehavior = prev.overscrollBehavior;
-        if (typeof prev.scrollTop === 'number' && el !== document.body && el !== document.documentElement) {
-          el.scrollTop = prev.scrollTop;
-        }
-      });
-      parentScrollLocked = [];
-    }
-  };
-};
-
-const useLockParentScroll = (enabled, getScrollElement) => {
-  const getScrollElementRef = useRef(getScrollElement);
-  getScrollElementRef.current = getScrollElement;
-  useEffect(() => {
-    if (!enabled) {
-      return undefined;
-    }
-    return lockParentScroll(() => (typeof getScrollElementRef.current === 'function' ? getScrollElementRef.current() : null));
-    // 仅随 open 开关锁定；避免 getScrollElement 引用变化导致 unlock/relock 把页面冲回顶部
-  }, [enabled]);
 };
 
 const sizeStyleVars = (size, hasFooter) => {

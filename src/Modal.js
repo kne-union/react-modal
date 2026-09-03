@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { App, Button, Modal as AntdModal } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
@@ -6,7 +6,10 @@ import { usePopupMount, useScrollElement, hoistOutOfModalRoot } from '@kne/respo
 import withLocale from './withLocale';
 import Footer from './Footer';
 import SimpleBar from './SimpleBar';
+import { lockParentScroll, useLockParentScroll } from './lockParentScroll';
 import style from './style.module.scss';
+
+export { lockParentScroll } from './lockParentScroll';
 
 const ModalLocaleRoot = withLocale(({ children }) => children);
 
@@ -50,48 +53,6 @@ export const resolveModalGetContainer = ({ customGetContainer, getPopupContainer
     }
     return getPopupContainer(triggerNode);
   };
-};
-
-let parentScrollLockCount = 0;
-let parentScrollLocked = [];
-
-export const lockParentScroll = getScrollElement => {
-  parentScrollLockCount += 1;
-  if (parentScrollLockCount === 1) {
-    const targets = [document.body];
-    const scrollEl = typeof getScrollElement === 'function' ? getScrollElement() : null;
-    if (scrollEl && scrollEl !== document.body && !targets.includes(scrollEl)) {
-      targets.push(scrollEl);
-    }
-    parentScrollLocked = targets.map(el => {
-      const prev = {
-        overflow: el.style.overflow,
-        overscrollBehavior: el.style.overscrollBehavior
-      };
-      el.style.overflow = 'hidden';
-      el.style.overscrollBehavior = 'none';
-      return { el, prev };
-    });
-  }
-  return () => {
-    parentScrollLockCount = Math.max(0, parentScrollLockCount - 1);
-    if (parentScrollLockCount === 0) {
-      parentScrollLocked.forEach(({ el, prev }) => {
-        el.style.overflow = prev.overflow;
-        el.style.overscrollBehavior = prev.overscrollBehavior;
-      });
-      parentScrollLocked = [];
-    }
-  };
-};
-
-const useLockParentScroll = (enabled, getScrollElement) => {
-  useEffect(() => {
-    if (!enabled) {
-      return undefined;
-    }
-    return lockParentScroll(getScrollElement);
-  }, [enabled, getScrollElement]);
 };
 
 const sizeStyleVars = (size, hasFooter) => {
