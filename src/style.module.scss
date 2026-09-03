@@ -111,10 +111,13 @@
     .modal-body {
       flex: 1 1 auto;
       min-height: 0;
+      height: auto !important;
+      max-height: none !important;
     }
 
     .modal-footer {
       flex: none;
+      margin-top: auto;
     }
   }
 }
@@ -280,15 +283,6 @@
   --kne-modal-body-max-height: 420px;
   --kne-modal-body-height: min(420px, calc(var(--kne-modal-viewport-height) - var(--kne-modal-title-height) - var(--kne-modal-footer-height) - var(--kne-modal-viewport-gutter)));
   --kne-modal-content-height: calc(var(--kne-modal-body-height) - var(--kne-modal-body-padding-vertical));
-
-  // 移动端保持居中卡片：缩小 gutter，避免 body 过矮；footer 仍在卡片底部
-  @include resp.mobile-container {
-    --kne-modal-viewport-gutter: 48px;
-    --kne-modal-body-padding-vertical: 24px;
-    --kne-modal-body-padding-horizontal: 24px;
-    --kne-modal-footer-height: 61px;
-    max-width: calc(100% - 32px);
-  }
 }
 
 .modal-wrap-centered:global(.ant-modal-wrap) {

@@ -77,7 +77,7 @@ const sizeStyleVars = (size, hasFooter) => {
   };
 };
 
-const ModalOuter = ({ title, footer, footerButtons, noPadding, onClose, closable, onConfirm, onCancel, children, targetProps, cancelText, confirmText, isMobile, useMobileLayout, bodyScroll }) => {
+const ModalOuter = ({ title, footer, footerButtons, noPadding, onClose, closable, onConfirm, onCancel, children, targetProps, cancelText, confirmText, isMobile, bodyScroll }) => {
   const effectiveNoPadding = noPadding ?? bodyScroll === false;
   const bodyInner = (
     <div
@@ -90,12 +90,14 @@ const ModalOuter = ({ title, footer, footerButtons, noPadding, onClose, closable
   );
 
   const bodyClassName = classnames(style['modal-body'], 'modal-body');
+  // 移动端全屏：body 用 flex 吃满 title/footer 之间剩余高度，footer 才能贴底；
+  // 勿写死 --kne-modal-body-height（高度受限类会把该值压矮，footer 悬在中间）
+  const bodyStyle = isMobile ? { flex: '1 1 auto', minHeight: 0, height: 'auto' } : { height: 'var(--kne-modal-body-height)' };
 
   return (
     <div
       className={classnames(style['modal-outer'], 'modal-container', {
-        // 全屏布局才上 is-mobile；高度受限居中时保持卡片高度，footer 贴卡片底
-        [style['is-mobile']]: useMobileLayout,
+        [style['is-mobile']]: isMobile,
         [style['no-title']]: !title,
         [style['no-footer']]: footer === null && footerButtons === undefined,
         [style['no-padding']]: effectiveNoPadding
@@ -116,25 +118,19 @@ const ModalOuter = ({ title, footer, footerButtons, noPadding, onClose, closable
       )}
       {title ? <div className={classnames(style['modal-title'], 'modal-title')}>{title}</div> : null}
       {bodyScroll !== false ? (
-        <SimpleBar className={bodyClassName} style={{ height: 'var(--kne-modal-body-height)' }}>
+        <SimpleBar className={bodyClassName} style={bodyStyle}>
           {bodyInner}
         </SimpleBar>
       ) : (
-        <div className={classnames(bodyClassName, style['body-scroll-off'])}>{bodyInner}</div>
+        <div className={classnames(bodyClassName, style['body-scroll-off'])} style={isMobile ? { flex: '1 1 auto', minHeight: 0 } : undefined}>
+          {bodyInner}
+        </div>
       )}
       {footer === null && footerButtons === undefined ? null : (
         <Footer footer={footer} footerButtons={footerButtons} onConfirm={onConfirm} confirmText={confirmText} onCancel={onCancel} cancelText={cancelText} onClose={onClose} targetProps={targetProps} isMobile={isMobile} />
       )}
     </div>
   );
-};
-
-const isHeightLimitedClass = className => {
-  if (!className) {
-    return false;
-  }
-  const list = typeof className === 'string' ? className.split(/\s+/) : [].concat(className);
-  return list.some(name => name === 'kne-modal-height-limited');
 };
 
 const computedCommonProps = ({
@@ -162,9 +158,7 @@ const computedCommonProps = ({
   modalRender,
   ...props
 }) => {
-  // 高度受限示例要保持「居中卡片」，移动端也不走全屏，否则 body 被压矮后 footer 悬在中间
-  const heightLimited = isHeightLimitedClass(className);
-  const useMobileLayout = isMobile && mobileFullscreen !== false && !heightLimited;
+  const useMobileLayout = isMobile && mobileFullscreen !== false;
   const hasFooter = !(footer === null && footerButtons === undefined);
   const sizeVars = sizeStyleVars(size, hasFooter);
   const { width, ...cssVars } = sizeVars;
@@ -184,8 +178,7 @@ const computedCommonProps = ({
         noPadding={noPadding}
         footer={renderWithOptions(footer, opts)}
         targetProps={opts}
-        isMobile={isMobile}
-        useMobileLayout={useMobileLayout}
+        isMobile={useMobileLayout}
         bodyScroll={bodyScroll}
       >
         {renderWithOptions(children, opts)}
