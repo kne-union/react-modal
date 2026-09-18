@@ -278,12 +278,20 @@ const computedCommonProps = ({
   };
 };
 
-const Modal = withLocale(({ size = 'default', getContainer, open, mobileFullscreen = true, bodyScroll = true, ...props }) => {
+const Modal = withLocale(({ size = 'default', getContainer, open, mobileFullscreen = true, bodyScroll = true, isMobile: isMobileProp, fixedModeClass: fixedModeClassProp, ...props }) => {
   const hostRef = useRef(null);
-  const { isMobile, fixedModeClass, getPopupContainer, anchorRef } = usePopupMount({
+  const {
+    isMobile: detectedIsMobile,
+    fixedModeClass: detectedFixedModeClass,
+    getPopupContainer,
+    anchorRef
+  } = usePopupMount({
     ...viewportPopupMountOptions,
     getPopupContainer: wrapCustomGetContainer(getContainer)
   });
+  // useModal 打开时可能已按 activeElement 解析出示例手机框，优先用调用方传入的 isMobile / fixedModeClass
+  const isMobile = isMobileProp ?? detectedIsMobile;
+  const fixedModeClass = fixedModeClassProp ?? detectedFixedModeClass;
   const getScrollElement = useScrollElement();
   useLockParentScroll(!!open, getScrollElement);
 
