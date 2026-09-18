@@ -2324,20 +2324,20 @@ render(
 
 挂在 `.modal` / `.modal-outer` 上，可业务覆盖。
 
-| 变量                                                          | 说明                                                                                                                                           |
-| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `--kne-modal-viewport-height`                                 | 默认 `var(--kne-viewport-height, 100vh)`                                                                                                       |
-| `--kne-modal-viewport-width`                                  | 默认 `var(--kne-viewport-width, 100vw)`                                                                                                        |
-| `--kne-modal-title-height`                                    | 标题区高度贡献，默认 `48px`；无 title 为 `0`                                                                                                   |
-| `--kne-modal-footer-height`                                   | footer 高度贡献，默认 `58px`；无 footer 为 `0`                                                                                                 |
-| `--kne-modal-viewport-gutter`                                 | 桌面相对视口留白合计，默认 `120px`；移动全屏 `0`                                                                                               |
-| `--kne-modal-body-padding-vertical`                           | body 上下 padding 合计，默认 `48px`；`noPadding` 为 `0`                                                                                        |
-| `--kne-modal-body-padding-horizontal`                         | body 左右 padding 合计，默认 `48px`；`noPadding` 为 `0`                                                                                        |
-| `--kne-modal-body-height`                                     | body 容器高度（**不**扣 body padding）                                                                                                         |
-| `--kne-modal-content-height`                                  | 内容高度；默认 `body-height − padding-vertical`。`bodyScroll={false}` 时在 `.modal-body` 内覆盖为 `100%`（相对 body 实高），供内部滚动容器使用 |
-| `--kne-modal-body-min-height` / `--kne-modal-body-max-height` | body 容器 min/max                                                                                                                              |
-| `--kne-modal-content-min-height`                              | content 侧 min                                                                                                                                 |
-| `--kne-modal-content-width`                                   | 内容宽度契约（扣 horizontal padding）                                                                                                          |
+| 变量                                                          | 说明                                                                                                                                                                                                               |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `--kne-modal-viewport-height`                                 | 默认 `var(--kne-viewport-height, 100vh)`                                                                                                                                                                           |
+| `--kne-modal-viewport-width`                                  | 默认 `var(--kne-viewport-width, 100vw)`                                                                                                                                                                            |
+| `--kne-modal-title-height`                                    | 标题区高度贡献，默认 `48px`；无 title 为 `0`                                                                                                                                                                       |
+| `--kne-modal-footer-height`                                   | footer 高度贡献，默认 `58px`；无 footer 为 `0`                                                                                                                                                                     |
+| `--kne-modal-viewport-gutter`                                 | 桌面相对视口留白合计，默认 `80px`；移动全屏 `0`                                                                                                                                                                    |
+| `--kne-modal-body-padding-vertical`                           | body 上下 padding 合计，默认 `48px`；`noPadding` 为 `0`                                                                                                                                                            |
+| `--kne-modal-body-padding-horizontal`                         | body 左右 padding 合计，默认 `48px`；`noPadding` 为 `0`                                                                                                                                                            |
+| `--kne-modal-body-height`                                     | body **上限**高度公式（`100vh − title − footer − gutter`，**不**扣 body padding）；`bodyScroll={false}` 时作为 body 实高                                                                                             |
+| `--kne-modal-content-height`                                  | 内容高度；默认 `body-height − padding-vertical`。`bodyScroll={false}` 时在 `.modal-body` 内覆盖为 `100%`（相对 body 实高），供内部滚动容器使用                                                                     |
+| `--kne-modal-body-min-height` / `--kne-modal-body-max-height` | body 容器 min/max。min 随 `size`：small 基准 300、default/large 基准 500，再扣 title/footer chrome；CSS 回退 small `252px` / 其它 `394px`。max 等于 `body-height`。桌面默认滚动：`height:auto`，不低于 min、不超过 max |
+| `--kne-modal-content-min-height`                              | content 侧 min（默认随 body-min − padding）                                                                                                                                                                        |
+| `--kne-modal-content-width`                                   | 内容宽度契约（扣 horizontal padding）                                                                                                                                                                              |
 
 #### 布局组合（Modal / Drawer 共用）
 

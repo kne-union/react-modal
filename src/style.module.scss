@@ -5,9 +5,10 @@
   --kne-modal-viewport-width: var(--kne-viewport-width, 100vw);
   --kne-modal-title-height: 48px;
   --kne-modal-footer-height: 58px;
-  --kne-modal-viewport-gutter: 120px;
+  --kne-modal-viewport-gutter: 80px;
   --kne-modal-body-padding-vertical: 48px;
   --kne-modal-body-padding-horizontal: 48px;
+  /* body 最低高度随 size（JS 会按是否有 footer 再扣 chrome）；上限见 body-max-height */
   --kne-modal-body-min-height: 394px;
   --kne-modal-body-height: calc(var(--kne-modal-viewport-height) - var(--kne-modal-title-height) - var(--kne-modal-footer-height) - var(--kne-modal-viewport-gutter));
   --kne-modal-body-max-height: var(--kne-modal-body-height);
@@ -138,13 +139,14 @@
 
 .modal-body {
   flex: 1 1 auto;
-  min-height: 0;
   min-height: var(--kne-modal-body-min-height);
   max-height: var(--kne-modal-body-max-height);
-  height: var(--kne-modal-body-height);
+  /* 默认跟内容；超出由 max-height + SimpleBar 滚动。bodyScroll=false 见下方写死满高 */
+  height: auto;
   box-sizing: border-box;
 
   &.body-scroll-off {
+    height: var(--kne-modal-body-height);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -167,7 +169,8 @@
 
 .modal-body-inner {
   padding: calc(var(--kne-modal-body-padding-vertical) / 2) calc(var(--kne-modal-body-padding-horizontal) / 2);
-  min-height: var(--kne-modal-content-height);
+  /* 与 body-min 对齐的小地板，不再用 content-height 把短内容撑满 */
+  min-height: var(--kne-modal-content-min-height);
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
