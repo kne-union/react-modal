@@ -1,4 +1,4 @@
-const { default: Modal, Drawer, DrawerContextHolder } = _ReactModal;
+const { default: Modal, Drawer, DrawerContextHolder, ModalContextHolder } = _ReactModal;
 const { Button, Space, Switch, Radio, Tag, Descriptions, Typography, App } = antd;
 const { useState, useEffect } = React;
 
@@ -134,12 +134,7 @@ const ChromeHeightExample = () => {
         <span>title</span>
         <Switch checked={hasTitle} onChange={setHasTitle} checkedChildren="有" unCheckedChildren="空" />
         <span>bodyScroll</span>
-        <Switch
-          checked={bodyScroll}
-          onChange={setBodyScroll}
-          checkedChildren="true"
-          unCheckedChildren="false"
-        />
+        <Switch checked={bodyScroll} onChange={setBodyScroll} checkedChildren="true" unCheckedChildren="false" />
       </Space>
       <div>
         <div style={{ marginBottom: 8 }}>footer</div>
@@ -189,9 +184,7 @@ const ChromeHeightExample = () => {
             }}
           >
             <div style={{ padding: 12 }}>
-              <p style={{ marginTop: 0, fontWeight: 600 }}>
-                滚动宿主 height: var({chrome.contentHeightVar})。footer=null 时 footer 变量应为 0。
-              </p>
+              <p style={{ marginTop: 0, fontWeight: 600 }}>滚动宿主 height: var({chrome.contentHeightVar})。footer=null 时 footer 变量应为 0。</p>
               {lines.map(text => (
                 <p key={text}>{text}</p>
               ))}
@@ -221,6 +214,7 @@ const ChromeHeightExample = () => {
 
 render(
   <App>
+    <ModalContextHolder />
     <DrawerContextHolder />
     <ChromeHeightExample />
   </App>

@@ -1,4 +1,4 @@
-const { default: Modal, Drawer, DrawerContextHolder } = _ReactModal;
+const { default: Modal, Drawer, DrawerContextHolder, ModalContextHolder } = _ReactModal;
 const { Button, Space, Switch, Tag, Descriptions, Radio, Typography, App } = antd;
 const { useState, useEffect } = React;
 
@@ -115,20 +115,14 @@ const HeightVarsExample = () => {
         />
       </Space>
       <Space wrap align="center">
-        <Switch
-          checked={customVars}
-          onChange={setCustomVars}
-          checkedChildren="自定义变量"
-          unCheckedChildren="默认变量"
-        />
+        <Switch checked={customVars} onChange={setCustomVars} checkedChildren="自定义变量" unCheckedChildren="默认变量" />
         <Button type="primary" onClick={() => setOpen(true)}>
           打开弹层对比高度
         </Button>
         <Tag color={customVars ? 'blue' : 'default'}>{customVars ? '已覆盖 CSS 变量' : '库内默认值'}</Tag>
       </Space>
       <div style={{ color: 'rgba(0,0,0,0.45)', maxWidth: 640 }}>
-        通过 <code>style</code> 覆盖 {chrome.varPrefix}-* 变量。Drawer 无 viewport-gutter；Modal 可加大 gutter
-        使 body 明显变矮。色块绑定 <code>{chrome.contentHeightVar}</code>。
+        通过 <code>style</code> 覆盖 {chrome.varPrefix}-* 变量。Drawer 无 viewport-gutter；Modal 可加大 gutter 使 body 明显变矮。色块绑定 <code>{chrome.contentHeightVar}</code>。
       </div>
       <HeightProbe open={open} revision={revision} mode={mode} />
       <Overlay
@@ -153,9 +147,7 @@ const HeightVarsExample = () => {
           }}
         >
           <div style={{ padding: 12 }}>
-            <p style={{ marginTop: 0, fontWeight: 600 }}>
-              色块 height = var({chrome.contentHeightVar})。切换「自定义/默认」与 Modal/Drawer 后重新打开对比。
-            </p>
+            <p style={{ marginTop: 0, fontWeight: 600 }}>色块 height = var({chrome.contentHeightVar})。切换「自定义/默认」与 Modal/Drawer 后重新打开对比。</p>
             {fillLines.map(text => (
               <p key={text} style={{ margin: '4px 0' }}>
                 {text}
@@ -170,6 +162,7 @@ const HeightVarsExample = () => {
 
 render(
   <App>
+    <ModalContextHolder />
     <DrawerContextHolder />
     <HeightVarsExample />
   </App>

@@ -1,4 +1,4 @@
-const { default: Modal, Drawer, DrawerContextHolder } = _ReactModal;
+const { default: Modal, Drawer, DrawerContextHolder, ModalContextHolder } = _ReactModal;
 const { Button, Space, message, Typography, Radio, App } = antd;
 const { useState, useEffect } = React;
 
@@ -55,9 +55,7 @@ const BasicExample = () => {
       <Button type="primary" onClick={() => setOpen(true)}>
         保存评估备注
       </Button>
-      <Text type="secondary">
-        最简受控弹层：切换 Modal / Drawer 对比同一套 props；异步 onConfirm 带 loading。
-      </Text>
+      <Text type="secondary">最简受控弹层：切换 Modal / Drawer 对比同一套 props；异步 onConfirm 带 loading。</Text>
       {isDrawer ? (
         <Drawer {...overlayProps} size="default">
           {content}
@@ -71,6 +69,7 @@ const BasicExample = () => {
 
 render(
   <App>
+    <ModalContextHolder />
     <DrawerContextHolder />
     <BasicExample />
   </App>

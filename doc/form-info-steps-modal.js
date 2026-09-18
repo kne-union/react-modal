@@ -1,4 +1,4 @@
-const { createModalRender, createDrawerRender, modalClassNames, DrawerContextHolder } = _ReactModal;
+const { createModalRender, createDrawerRender, modalClassNames, DrawerContextHolder, ModalContextHolder } = _ReactModal;
 const { default: FormInfo, FormStepsModal, List, Input, TextArea } = _FormInfo;
 const { Button, Space, Typography, App, message, Flex, Radio } = antd;
 const { useState, useEffect } = React;
@@ -20,25 +20,17 @@ const renderStepsModalBase = isDrawer =>
         className: modalClassNames.stepsForm
       });
 
-const renderStepsModal = isDrawer => ({
-  formProps,
-  saveText,
-  autoClose,
-  onCancel,
-  footer,
-  modalRender,
-  children,
-  className,
-  ...props
-}) =>
-  renderStepsModalBase(isDrawer)({
-    ...props,
-    className,
-    onClose: onCancel,
-    footer: typeof footer === 'function' ? footer() : footer,
-    modalRender,
-    children
-  });
+const renderStepsModal =
+  isDrawer =>
+  ({ formProps, saveText, autoClose, onCancel, footer, modalRender, children, className, ...props }) =>
+    renderStepsModalBase(isDrawer)({
+      ...props,
+      className,
+      onClose: onCancel,
+      footer: typeof footer === 'function' ? footer() : footer,
+      modalRender,
+      children
+    });
 
 const STEP_DATA = {
   name: '李四',
@@ -143,21 +135,9 @@ const FormInfoStepsModalExample = () => {
                   title="维度评分"
                   column={2}
                   gap={20}
-                  list={[
-                    <Input name="commScore" label="沟通表达" rule="REQ" />,
-                    <Input name="techScore" label="专业深度" rule="REQ" />,
-                    <Input name="projectScore" label="项目复杂度" rule="REQ" />
-                  ]}
+                  list={[<Input name="commScore" label="沟通表达" rule="REQ" />, <Input name="techScore" label="专业深度" rule="REQ" />, <Input name="projectScore" label="项目复杂度" rule="REQ" />]}
                 />
-                <FormInfo
-                  bordered
-                  title="评语"
-                  column={1}
-                  gap={20}
-                  list={[
-                    <TextArea name="summary" label="综合评语" rule="REQ" block rows={4} />
-                  ]}
-                />
+                <FormInfo bordered title="评语" column={1} gap={20} list={[<TextArea name="summary" label="综合评语" rule="REQ" block rows={4} />]} />
               </Flex>
             )
           },
@@ -174,22 +154,9 @@ const FormInfoStepsModalExample = () => {
                   maxLength={5}
                   addText="添加经历"
                   itemTitle={({ index, data }) => data?.companyName || `经历 ${index + 1}`}
-                  list={[
-                    <Input name="companyName" label="公司" rule="REQ" />,
-                    <Input name="role" label="职位" rule="REQ" />,
-                    <Input name="years" label="年限" placeholder="例如 2年" />
-                  ]}
+                  list={[<Input name="companyName" label="公司" rule="REQ" />, <Input name="role" label="职位" rule="REQ" />, <Input name="years" label="年限" placeholder="例如 2年" />]}
                 />
-                <FormInfo
-                  bordered
-                  title="目标与风险"
-                  column={1}
-                  gap={20}
-                  list={[
-                    <TextArea name="objectives" label="培养目标" rule="REQ" block rows={4} />,
-                    <TextArea name="risks" label="风险与跟进" block rows={3} />
-                  ]}
-                />
+                <FormInfo bordered title="目标与风险" column={1} gap={20} list={[<TextArea name="objectives" label="培养目标" rule="REQ" block rows={4} />, <TextArea name="risks" label="风险与跟进" block rows={3} />]} />
               </Flex>
             )
           }
@@ -201,6 +168,7 @@ const FormInfoStepsModalExample = () => {
 
 render(
   <App>
+    <ModalContextHolder />
     <DrawerContextHolder />
     <FormInfoStepsModalExample />
   </App>

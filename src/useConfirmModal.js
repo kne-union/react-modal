@@ -110,38 +110,44 @@ const mapConfirmProps = (props, { isMobile, fixedModeClass, getPopupContainer, a
     isMobile
   });
 
+  // Confirm 走 antd ConfirmDialog：未传 zIndex 时用 static 顶层，适合真确认框盖住内容弹窗
+  const config = {
+    ...otherProps,
+    okText: confirmText ?? otherProps.okText,
+    cancelText: cancelText ?? otherProps.cancelText,
+    onOk: onConfirm ?? otherProps.onOk,
+    onCancel: onCancel ?? otherProps.onCancel,
+    getContainer: resolveModalGetContainer({
+      customGetContainer,
+      getPopupContainer,
+      getHostNode: () => anchor
+    }),
+    centered: true,
+    afterClose: (...args) => {
+      unlock();
+      userAfterClose && userAfterClose(...args);
+      afterClose && afterClose(...args);
+    },
+    icon: null,
+    classNames: {
+      mask: classnames(isMobile && modalStyle['modal-mask-fullscreen'], isMobile && fixedModeClass, otherProps.classNames?.mask)
+    },
+    wrapClassName: classnames(modalStyle['modal-wrap'], modalStyle['modal-wrap-centered'], confirmStyle['confirm-modal-wrap'], wrapClassName, {
+      [confirmStyle['is-danger']]: danger,
+      [confirmStyle['is-mobile']]: isMobile,
+      [fixedModeClass]: isMobile
+    }),
+    title: confirmTitle ? <ConfirmLocaleRoot>{confirmTitle}</ConfirmLocaleRoot> : null,
+    content: <ConfirmLocaleRoot>{content}</ConfirmLocaleRoot>
+  };
+
+  if (zIndex !== undefined) {
+    config.zIndex = zIndex;
+  }
+
   return {
     modalMethod: type,
-    config: {
-      ...otherProps,
-      zIndex: zIndex ?? 1100,
-      okText: confirmText ?? otherProps.okText,
-      cancelText: cancelText ?? otherProps.cancelText,
-      onOk: onConfirm ?? otherProps.onOk,
-      onCancel: onCancel ?? otherProps.onCancel,
-      getContainer: resolveModalGetContainer({
-        customGetContainer,
-        getPopupContainer,
-        getHostNode: () => anchor
-      }),
-      centered: true,
-      afterClose: (...args) => {
-        unlock();
-        userAfterClose && userAfterClose(...args);
-        afterClose && afterClose(...args);
-      },
-      icon: null,
-      classNames: {
-        mask: classnames(isMobile && modalStyle['modal-mask-fullscreen'], isMobile && fixedModeClass, otherProps.classNames?.mask)
-      },
-      wrapClassName: classnames(modalStyle['modal-wrap'], modalStyle['modal-wrap-centered'], confirmStyle['confirm-modal-wrap'], wrapClassName, {
-        [confirmStyle['is-danger']]: danger,
-        [confirmStyle['is-mobile']]: isMobile,
-        [fixedModeClass]: isMobile
-      }),
-      title: confirmTitle ? <ConfirmLocaleRoot>{confirmTitle}</ConfirmLocaleRoot> : null,
-      content: <ConfirmLocaleRoot>{content}</ConfirmLocaleRoot>
-    }
+    config
   };
 };
 

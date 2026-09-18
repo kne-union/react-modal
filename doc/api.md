@@ -4,52 +4,54 @@
 
 #### 属性
 
-| 属性 | 类型 | 默认值 | 描述 |
-|------|------|--------|------|
-| open | boolean | - | 是否显示 |
-| onClose | function | - | 关闭回调；受控时由此改 `open` |
-| title | ReactNode \| function | - | 标题；为 function 时入参含 `close` |
-| children | ReactNode \| function | - | 内容；为 function 时入参含 `close` |
-| onConfirm | function | - | 默认确认按钮；支持 Promise；返回 `false` 不关闭 |
-| onCancel | function | - | 默认取消按钮；语义同 `onConfirm` |
-| confirmText | ReactNode | - | 默认确认文案（默认 intl Confirm） |
-| cancelText | ReactNode | - | 默认取消文案（默认 intl Cancel） |
-| footer | ReactNode \| function \| null | - | 左侧 footer 插槽；与 `footerButtons` 均为「未设置」且 `footer === null` 时不渲染 footer |
-| footerButtons | array \| function | - | 右侧按钮区，见下表；未传时为取消+确认 |
-| size | `small` \| `default` \| `large` | `default` | 桌面宽度档位 |
-| noPadding | boolean | false | 去掉 body 内边距。未传且 `bodyScroll={false}` 时默认视为 true；显式 `noPadding={false}` 可保留内边距 |
-| maskClosable | boolean | false | 点击蒙层是否关闭 |
-| closable | boolean | true | 是否显示右上角关闭 |
-| bodyScroll | boolean | true | true 使用 SimpleBar；false 不挂 SimpleBar，内容自管滚动，且默认 noPadding（可用 `noPadding={false}` 覆盖） |
-| mobileFullscreen | boolean | true | 移动端是否全屏 |
-| getContainer | HTMLElement \| function | - | 挂载容器；嵌套时默认挂到外层 `.ant-modal-root` 外侧 |
-| width / zIndex / className / afterClose / style / styles | - | - | 透传或覆盖 antd Modal |
+| 属性                                                     | 类型                            | 默认值    | 描述                                                                                                       |
+| -------------------------------------------------------- | ------------------------------- | --------- | ---------------------------------------------------------------------------------------------------------- |
+| open                                                     | boolean                         | -         | 是否显示                                                                                                   |
+| onClose                                                  | function                        | -         | 关闭回调；受控时由此改 `open`                                                                              |
+| title                                                    | ReactNode \| function           | -         | 标题；为 function 时入参含 `close`                                                                         |
+| children                                                 | ReactNode \| function           | -         | 内容；为 function 时入参含 `close`                                                                         |
+| onConfirm                                                | function                        | -         | 默认确认按钮；支持 Promise；返回 `false` 不关闭                                                            |
+| onCancel                                                 | function                        | -         | 默认取消按钮；语义同 `onConfirm`                                                                           |
+| confirmText                                              | ReactNode                       | -         | 默认确认文案（默认 intl Confirm）                                                                          |
+| cancelText                                               | ReactNode                       | -         | 默认取消文案（默认 intl Cancel）                                                                           |
+| footer                                                   | ReactNode \| function \| null   | -         | 左侧 footer 插槽；与 `footerButtons` 均为「未设置」且 `footer === null` 时不渲染 footer                    |
+| footerButtons                                            | array \| function               | -         | 右侧按钮区，见下表；未传时为取消+确认                                                                      |
+| size                                                     | `small` \| `default` \| `large` | `default` | 桌面宽度档位                                                                                               |
+| noPadding                                                | boolean                         | false     | 去掉 body 内边距。未传且 `bodyScroll={false}` 时默认视为 true；显式 `noPadding={false}` 可保留内边距       |
+| maskClosable                                             | boolean                         | false     | 点击蒙层是否关闭                                                                                           |
+| closable                                                 | boolean                         | true      | 是否显示右上角关闭                                                                                         |
+| bodyScroll                                               | boolean                         | true      | true 使用 SimpleBar；false 不挂 SimpleBar，内容自管滚动，且默认 noPadding（可用 `noPadding={false}` 覆盖） |
+| mobileFullscreen                                         | boolean                         | true      | 移动端是否全屏                                                                                             |
+| getContainer                                             | HTMLElement \| function         | -         | 挂载容器；嵌套时默认挂到外层 `.ant-modal-root` 外侧                                                        |
+| width / zIndex / className / afterClose / style / styles | -                               | -         | 透传或覆盖 antd Modal                                                                                      |
 
 其余未列出参数按 antd Modal 习惯透传。
 
 #### footerButtons 项
 
-| 属性 | 类型 | 默认值 | 描述 |
-|------|------|--------|------|
-| children | ReactNode | - | 按钮文案 |
-| type | string | - | antd Button type |
-| onClick | function | - | 可返回 Promise；末参为 `targetProps`（含 `close`）；`autoClose` 且结果 `!== false` 时关闭 |
-| autoClose | boolean | true | 点击后是否自动关闭 |
-| display | boolean \| function | - | `false` 隐藏；function 返回值决定是否展示 |
-| ButtonComponent | component | - | 自定义按钮；默认走 ButtonGroup 内 LoadingButton |
-| ... | - | - | 其余透传 Button |
+| 属性            | 类型                | 默认值 | 描述                                                                                      |
+| --------------- | ------------------- | ------ | ----------------------------------------------------------------------------------------- |
+| children        | ReactNode           | -      | 按钮文案                                                                                  |
+| type            | string              | -      | antd Button type                                                                          |
+| onClick         | function            | -      | 可返回 Promise；末参为 `targetProps`（含 `close`）；`autoClose` 且结果 `!== false` 时关闭 |
+| autoClose       | boolean             | true   | 点击后是否自动关闭                                                                        |
+| display         | boolean \| function | -      | `false` 隐藏；function 返回值决定是否展示                                                 |
+| ButtonComponent | component           | -      | 自定义按钮；默认走 ButtonGroup 内 LoadingButton                                           |
+| ...             | -                   | -      | 其余透传 Button                                                                           |
 
 - `footerButtons={[]}`：不渲染按钮列（可与左侧 `footer` 并存）。**移动端**此模式且 `footer` 有内容时（如 FormModal 自带 Submit/Cancel），按钮区会自动居中，与默认 `footerButtons` 行为一致。
 - `footer === null` 且未传 `footerButtons`：不渲染整个 footer 区
 
 ### useModal
 
+命令式内容弹窗。须在 antd `App` 内挂载 **`<ModalContextHolder />`**（页面根层）；弹窗内容树内另有 `ModalLayerProvider`，嵌套 `useModal` 会就近 patch，叠层交给 antd `ZIndexContext`。**不**再走 `App.modal.info` / ConfirmDialog。
+
 命令式打开弹窗，参数同 Modal。需在 antd `App`（或 `App.useApp` 可用）上下文中使用。
 
 #### 返回值
 
-| 属性 | 类型 | 描述 |
-|------|------|------|
+| 属性  | 类型     | 描述                                                      |
+| ----- | -------- | --------------------------------------------------------- |
 | modal | function | 调用后弹出 Modal；返回 `{ close }`；默认 `zIndex` 为 1100 |
 
 ### useConfirmModal
@@ -58,29 +60,29 @@
 
 #### 参数
 
-| 属性 | 类型 | 默认值 | 描述 |
-|------|------|--------|------|
-| type | `confirm` \| `info` \| `success` \| `warning` \| `error` | `confirm` | 调用 `modal[type]` |
-| title | ReactNode | - | 标题 |
-| message | ReactNode | - | 正文 |
-| danger | boolean | false | 为 true 时展示语义图标，确认钮危险色 |
-| confirmType | `info` \| `warning` \| `error` \| `success` | `info` | `type=confirm` 时图标语义 |
-| icon | ReactNode | - | 自定义图标，覆盖默认 |
-| onConfirm | function | - | 映射 antd `onOk` |
-| onCancel | function | - | 映射 antd `onCancel` |
-| confirmText | ReactNode | - | 映射 `okText` |
-| cancelText | ReactNode | - | 映射 `cancelText` |
-| onClose | function | - | 调用 `close()` 时触发 |
-| maskClosable | boolean | false | 默认不可点蒙层关闭 |
-| getContainer | HTMLElement \| function | - | 嵌套时挂到外层 modal 外侧 |
-| afterClose / zIndex / wrapClassName | - | - | 透传；默认 `zIndex` 1100 |
+| 属性                                | 类型                                                     | 默认值    | 描述                                 |
+| ----------------------------------- | -------------------------------------------------------- | --------- | ------------------------------------ |
+| type                                | `confirm` \| `info` \| `success` \| `warning` \| `error` | `confirm` | 调用 `modal[type]`                   |
+| title                               | ReactNode                                                | -         | 标题                                 |
+| message                             | ReactNode                                                | -         | 正文                                 |
+| danger                              | boolean                                                  | false     | 为 true 时展示语义图标，确认钮危险色 |
+| confirmType                         | `info` \| `warning` \| `error` \| `success`              | `info`    | `type=confirm` 时图标语义            |
+| icon                                | ReactNode                                                | -         | 自定义图标，覆盖默认                 |
+| onConfirm                           | function                                                 | -         | 映射 antd `onOk`                     |
+| onCancel                            | function                                                 | -         | 映射 antd `onCancel`                 |
+| confirmText                         | ReactNode                                                | -         | 映射 `okText`                        |
+| cancelText                          | ReactNode                                                | -         | 映射 `cancelText`                    |
+| onClose                             | function                                                 | -         | 调用 `close()` 时触发                |
+| maskClosable                        | boolean                                                  | false     | 默认不可点蒙层关闭                   |
+| getContainer                        | HTMLElement \| function                                  | -         | 嵌套时挂到外层 modal 外侧            |
+| afterClose / zIndex / wrapClassName | -                                                        | -         | 透传；默认 `zIndex` 1100             |
 
 其余未列出参数按 antd Modal.confirm 习惯透传。
 
 #### 返回值
 
-| 属性 | 类型 | 描述 |
-|------|------|------|
+| 属性         | 类型     | 描述                               |
+| ------------ | -------- | ---------------------------------- |
 | confirmModal | function | 调用后弹出确认框；返回 `{ close }` |
 
 与 `useModal` 对比：专用于短文案确认 / 提示，桌面居中窄宽（约 400px），无 SimpleBar body。
@@ -89,20 +91,20 @@
 
 挂在 `.modal` / `.modal-outer` 上，可业务覆盖。
 
-| 变量 | 说明 |
-|------|------|
-| `--kne-modal-viewport-height` | 默认 `var(--kne-viewport-height, 100vh)` |
-| `--kne-modal-viewport-width` | 默认 `var(--kne-viewport-width, 100vw)` |
-| `--kne-modal-title-height` | 标题区高度贡献，默认 `48px`；无 title 为 `0` |
-| `--kne-modal-footer-height` | footer 高度贡献，默认 `58px`；无 footer 为 `0` |
-| `--kne-modal-viewport-gutter` | 桌面相对视口留白合计，默认 `120px`；移动全屏 `0` |
-| `--kne-modal-body-padding-vertical` | body 上下 padding 合计，默认 `48px`；`noPadding` 为 `0` |
-| `--kne-modal-body-padding-horizontal` | body 左右 padding 合计，默认 `48px`；`noPadding` 为 `0` |
-| `--kne-modal-body-height` | body 容器高度（**不**扣 body padding） |
-| `--kne-modal-content-height` | 内容高度；默认 `body-height − padding-vertical`。`bodyScroll={false}` 时在 `.modal-body` 内覆盖为 `100%`（相对 body 实高），供内部滚动容器使用 |
-| `--kne-modal-body-min-height` / `--kne-modal-body-max-height` | body 容器 min/max |
-| `--kne-modal-content-min-height` | content 侧 min |
-| `--kne-modal-content-width` | 内容宽度契约（扣 horizontal padding） |
+| 变量                                                          | 说明                                                                                                                                                                                                               |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `--kne-modal-viewport-height`                                 | 默认 `var(--kne-viewport-height, 100vh)`                                                                                                                                                                           |
+| `--kne-modal-viewport-width`                                  | 默认 `var(--kne-viewport-width, 100vw)`                                                                                                                                                                            |
+| `--kne-modal-title-height`                                    | 标题区高度贡献，默认 `48px`；无 title 为 `0`                                                                                                                                                                       |
+| `--kne-modal-footer-height`                                   | footer 高度贡献，默认 `58px`；无 footer 为 `0`                                                                                                                                                                     |
+| `--kne-modal-viewport-gutter`                                 | 桌面相对视口留白合计，默认 `80px`；移动全屏 `0`                                                                                                                                                                    |
+| `--kne-modal-body-padding-vertical`                           | body 上下 padding 合计，默认 `48px`；`noPadding` 为 `0`                                                                                                                                                            |
+| `--kne-modal-body-padding-horizontal`                         | body 左右 padding 合计，默认 `48px`；`noPadding` 为 `0`                                                                                                                                                            |
+| `--kne-modal-body-height`                                     | body **上限**高度公式（`100vh − title − footer − gutter`，**不**扣 body padding）；`bodyScroll={false}` 时作为 body 实高                                                                                             |
+| `--kne-modal-content-height`                                  | 内容高度；默认 `body-height − padding-vertical`。`bodyScroll={false}` 时在 `.modal-body` 内覆盖为 `100%`（相对 body 实高），供内部滚动容器使用                                                                     |
+| `--kne-modal-body-min-height` / `--kne-modal-body-max-height` | body 容器 min/max。min 随 `size`：small 基准 300、default/large 基准 500，再扣 title/footer chrome；CSS 回退 small `252px` / 其它 `394px`。max 等于 `body-height`。桌面默认滚动：`height:auto`，不低于 min、不超过 max |
+| `--kne-modal-content-min-height`                              | content 侧 min（默认随 body-min − padding）                                                                                                                                                                        |
+| `--kne-modal-content-width`                                   | 内容宽度契约（扣 horizontal padding）                                                                                                                                                                              |
 
 ### 布局组合（Modal / Drawer 共用）
 
@@ -127,10 +129,10 @@ Tabs / 分栏弹层须 **`bodyScroll={false}`**，此时默认 **noPadding**（�
 
 #### modalClassNames
 
-| 常量 | 值 | 用途 |
-|------|-----|------|
+| 常量        | 值                       | 用途                               |
+| ----------- | ------------------------ | ---------------------------------- |
 | `stepsForm` | `react-modal-steps-form` | 分步弹窗挂 `className`，去横向溢出 |
-| `splitter` | `react-modal-splitter` | antd Splitter 在弹层内的高度链 |
+| `splitter`  | `react-modal-splitter`   | antd Splitter 在弹层内的高度链     |
 
 #### createModalRender
 
@@ -142,11 +144,11 @@ createModalRender(modalDefaults) => (hostProps) => Modal
 
 推荐 `modalDefaults`：
 
-| 场景 | modalDefaults |
-|------|---------------|
-| 子内容自带 Footer | `{ footerButtons: [] }` |
-| 长内容 | `{ footerButtons: [], bodyScroll: true, size: 'large' }` |
-| 分步弹窗 | `{ footerButtons: [], bodyScroll: true, size: 'default', className: modalClassNames.stepsForm }` |
+| 场景              | modalDefaults                                                                                    |
+| ----------------- | ------------------------------------------------------------------------------------------------ |
+| 子内容自带 Footer | `{ footerButtons: [] }`                                                                          |
+| 长内容            | `{ footerButtons: [], bodyScroll: true, size: 'large' }`                                         |
+| 分步弹窗          | `{ footerButtons: [], bodyScroll: true, size: 'default', className: modalClassNames.stepsForm }` |
 
 ### Drawer
 
@@ -154,11 +156,11 @@ createModalRender(modalDefaults) => (hostProps) => Modal
 
 #### 属性（差异与补充）
 
-| 属性 | 类型 | 默认值 | 描述 |
-|------|------|--------|------|
-| placement | `left` \| `right` \| `top` \| `bottom` | `right` | 滑出方向；`size` 映射 width（left/right）或 height（top/bottom） |
-| size | `small` \| `default` \| `large` | `default` | 600 / 1000 / min(vw−64, 1500) px |
-| 移动端 | - | 侧滑全宽 | left/right → 100vw；top/bottom → 100vh（非 Modal 式全屏居中） |
+| 属性      | 类型                                   | 默认值    | 描述                                                             |
+| --------- | -------------------------------------- | --------- | ---------------------------------------------------------------- |
+| placement | `left` \| `right` \| `top` \| `bottom` | `right`   | 滑出方向；`size` 映射 width（left/right）或 height（top/bottom） |
+| size      | `small` \| `default` \| `large`        | `default` | 600 / 1000 / min(vw−64, 1500) px                                 |
+| 移动端    | -                                      | 侧滑全宽  | left/right → 100vw；top/bottom → 100vh（非 Modal 式全屏居中）    |
 
 其余 `open` / `onClose` / `title` / `children` / `footer` / `footerButtons` / `bodyScroll` / `noPadding` / `closable` / `maskClosable` / `getContainer` 等与 Modal 相同。
 
@@ -181,4 +183,3 @@ createDrawerRender(drawerDefaults) => (hostProps) => Drawer
 ```
 
 单参数合并渲染；宿主字段映射由 `renderModal` 回调内完成（同 `createModalRender`）。
-

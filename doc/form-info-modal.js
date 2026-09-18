@@ -1,4 +1,4 @@
-const { createModalRender, createDrawerRender, DrawerContextHolder } = _ReactModal;
+const { createModalRender, createDrawerRender, DrawerContextHolder, ModalContextHolder } = _ReactModal;
 const { default: FormInfo, FormModal, Input, TextArea } = _FormInfo;
 const { Button, Space, Typography, App, message, Switch, Flex, Radio } = antd;
 const { useState, useMemo, useEffect } = React;
@@ -34,11 +34,7 @@ const SECTION_DEFS = [
   {
     key: 'experience',
     title: '经历与补充',
-    fields: Array.from({ length: 16 }, (_, i) => [
-      `expField${i + 1}`,
-      `经历补充项 ${i + 1}`,
-      i % 4 === 0 ? 'REQ' : ''
-    ])
+    fields: Array.from({ length: 16 }, (_, i) => [`expField${i + 1}`, `经历补充项 ${i + 1}`, i % 4 === 0 ? 'REQ' : ''])
   }
 ];
 
@@ -58,8 +54,7 @@ const buildInitialData = () => {
     collabScore: '4',
     cultureScore: '5',
     overallScore: '4.5',
-    summary:
-      '沟通清晰，项目推进稳定。以下为加长评估说明，用于验证弹窗 body 在超长表单下的 SimpleBar 滚动：标题与底部按钮应固定，仅中间表单区域滚动。'.repeat(3)
+    summary: '沟通清晰，项目推进稳定。以下为加长评估说明，用于验证弹窗 body 在超长表单下的 SimpleBar 滚动：标题与底部按钮应固定，仅中间表单区域滚动。'.repeat(3)
   };
   SECTION_DEFS[2].fields.forEach(([name], i) => {
     data[name] = `补充说明内容 ${i + 1}：用于拉长表单高度。`;
@@ -88,20 +83,8 @@ const LongFormFields = () => (
       gap={20}
       list={[
         <TextArea key="summary" name="summary" label="综合评语" rule="REQ" block />,
-        <TextArea
-          key="risk"
-          name="risk"
-          label="风险与待跟进"
-          block
-          placeholder="列出风险点、待确认事项等"
-        />,
-        <TextArea
-          key="plan"
-          name="plan"
-          label="入职 / 下轮计划"
-          block
-          placeholder="试用期目标、面试官建议等"
-        />
+        <TextArea key="risk" name="risk" label="风险与待跟进" block placeholder="列出风险点、待确认事项等" />,
+        <TextArea key="plan" name="plan" label="入职 / 下轮计划" block placeholder="试用期目标、面试官建议等" />
       ]}
     />
     {Array.from({ length: 8 }, (_, block) => (
@@ -133,20 +116,9 @@ const FormInfoModalExample = () => {
     }
   }, [mode]);
 
-  const renderModalBase = isDrawer
-    ? createDrawerRender({ placement: 'right', footerButtons: [], bodyScroll: true, size: 'large' })
-    : createModalRender({ footerButtons: [], bodyScroll: true, size: 'large' });
+  const renderModalBase = isDrawer ? createDrawerRender({ placement: 'right', footerButtons: [], bodyScroll: true, size: 'large' }) : createModalRender({ footerButtons: [], bodyScroll: true, size: 'large' });
 
-  const renderModal = ({
-    formProps,
-    saveText,
-    autoClose,
-    onCancel,
-    footer,
-    modalRender,
-    children,
-    ...props
-  }) =>
+  const renderModal = ({ formProps, saveText, autoClose, onCancel, footer, modalRender, children, ...props }) =>
     renderModalBase({
       ...props,
       bodyScroll,
@@ -180,9 +152,7 @@ const FormInfoModalExample = () => {
           <Switch checked={bodyScroll} onChange={setBodyScroll} checkedChildren="开" unCheckedChildren="关" />
         </Space>
       </Space>
-      <Text type="secondary">
-        createModalRender / createDrawerRender 注入默认 props；切换 Modal / Drawer 对比 form-info 宿主集成。
-      </Text>
+      <Text type="secondary">createModalRender / createDrawerRender 注入默认 props；切换 Modal / Drawer 对比 form-info 宿主集成。</Text>
 
       <FormModal
         title={isDrawer ? '候选人深度评估（侧滑）' : '候选人深度评估（超长表单）'}
@@ -208,6 +178,7 @@ const FormInfoModalExample = () => {
 
 render(
   <App>
+    <ModalContextHolder />
     <DrawerContextHolder />
     <FormInfoModalExample />
   </App>

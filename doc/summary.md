@@ -4,7 +4,7 @@
 
 ### 主要特性
 
-- 声明式 / 命令式同一套 props 与 UI（Modal `useModal`；Drawer `useDrawer` + `DrawerContextHolder`；确认框 `useConfirmModal`）
+- 声明式 / 命令式同一套 props 与 UI（Modal `useModal` + `ModalContextHolder`，多层就近 LayerHolder；Drawer `useDrawer` + `DrawerContextHolder`；确认框 `useConfirmModal`）
 - `footer` + `footerButtons`（`ButtonComponent` / `display` / `autoClose`）
 - title / footer 固定在滚动外，body 默认 SimpleBar
 - `--kne-modal-*` / `--kne-drawer-*` CSS 变量管理高度链

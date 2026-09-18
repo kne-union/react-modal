@@ -1,4 +1,4 @@
-const { default: Modal, Drawer, DrawerContextHolder } = _ReactModal;
+const { default: Modal, Drawer, DrawerContextHolder, ModalContextHolder } = _ReactModal;
 const { Button, Space, Radio, Tag, message, Typography, App } = antd;
 const { useState, useEffect } = React;
 
@@ -58,14 +58,8 @@ const FooterButtonsExample = () => {
         </Space>
       </div>
       <div className="demo-job-preview-body">
-        <Paragraph style={{ marginTop: 0 }}>
-          负责招聘中台、候选人评估等 B 端产品的前端交付；要求熟悉 React、工程化与组件库协作。
-        </Paragraph>
-        <Paragraph style={{ marginBottom: 0 }}>
-          {noPadding
-            ? 'noPadding=true：预览卡片应贴齐内容区边缘。'
-            : 'noPadding=false：预览卡片四周保留默认内边距。'}
-        </Paragraph>
+        <Paragraph style={{ marginTop: 0 }}>负责招聘中台、候选人评估等 B 端产品的前端交付；要求熟悉 React、工程化与组件库协作。</Paragraph>
+        <Paragraph style={{ marginBottom: 0 }}>{noPadding ? 'noPadding=true：预览卡片应贴齐内容区边缘。' : 'noPadding=false：预览卡片四周保留默认内边距。'}</Paragraph>
       </div>
     </div>
   );
@@ -106,17 +100,14 @@ const FooterButtonsExample = () => {
           noPadding={String(noPadding)}
         </Button>
       </Space>
-      {isDrawer ? (
-        <Drawer {...overlayProps}>{content}</Drawer>
-      ) : (
-        <Modal {...overlayProps}>{content}</Modal>
-      )}
+      {isDrawer ? <Drawer {...overlayProps}>{content}</Drawer> : <Modal {...overlayProps}>{content}</Modal>}
     </Space>
   );
 };
 
 render(
   <App>
+    <ModalContextHolder />
     <DrawerContextHolder />
     <FooterButtonsExample />
   </App>

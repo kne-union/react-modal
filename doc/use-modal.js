@@ -1,4 +1,4 @@
-const { useModal, useDrawer, DrawerContextHolder } = _ReactModal;
+const { useModal, useDrawer, DrawerContextHolder, ModalContextHolder } = _ReactModal;
 const { Button, Space, message, Descriptions, Tag, Typography, Radio, App } = antd;
 const { useState } = React;
 
@@ -27,8 +27,7 @@ const CommandExample = () => {
             </Descriptions.Item>
           </Descriptions>
           <Paragraph type="secondary" style={{ marginBottom: 12 }}>
-            命令式 {isDrawer ? 'Drawer' : 'Modal'} 适用于列表页「快速查看」；children 为函数时可调用{' '}
-            <Text code>close()</Text> 主动关闭。
+            命令式 {isDrawer ? 'Drawer' : 'Modal'} 适用于列表页「快速查看」；children 为函数时可调用 <Text code>close()</Text> 主动关闭。
           </Paragraph>
           <Button size="small" onClick={() => close()}>
             关闭
@@ -59,15 +58,14 @@ const CommandExample = () => {
       <Button type="primary" onClick={openDetail}>
         从列表打开候选人快览
       </Button>
-      <Text type="secondary">
-        Drawer 模式需挂载 DrawerContextHolder；Modal 使用 antd App 内置 useModal。
-      </Text>
+      <Text type="secondary">须挂载 ModalContextHolder（内容弹窗 useModal）与 DrawerContextHolder（useDrawer）；确认框仍用 useConfirmModal。</Text>
     </Space>
   );
 };
 
 render(
   <App>
+    <ModalContextHolder />
     <DrawerContextHolder />
     <CommandExample />
   </App>
