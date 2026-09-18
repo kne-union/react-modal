@@ -1,27 +1,5 @@
-const {
-  default: Modal,
-  Drawer,
-  DrawerContextHolder,
-  TabsLayout,
-  ColumnsLayout,
-  ScrollRegion,
-  modalClassNames
-} = _ReactModal;
-const {
-  Button,
-  Space,
-  Splitter,
-  Input,
-  Avatar,
-  Tag,
-  Descriptions,
-  Progress,
-  Typography,
-  Divider,
-  App,
-  message,
-  Radio
-} = antd;
+const { default: Modal, Drawer, DrawerContextHolder, ModalContextHolder, TabsLayout, ColumnsLayout, ScrollRegion, modalClassNames } = _ReactModal;
+const { Button, Space, Splitter, Input, Avatar, Tag, Descriptions, Progress, Typography, Divider, App, message, Radio } = antd;
 const { useState, useMemo, useEffect } = React;
 
 const { Text, Title, Paragraph } = Typography;
@@ -178,26 +156,15 @@ const SCORE_LABELS = {
 const CandidateList = ({ items, activeKey, onSelect, search, onSearchChange }) => (
   <>
     <div className="modal-scroll-region-sticky candidate-list-toolbar">
-      <Input
-        allowClear
-        placeholder="搜索姓名、岗位、城市…"
-        value={search}
-        onChange={e => onSearchChange(e.target.value)}
-      />
+      <Input allowClear placeholder="搜索姓名、岗位、城市…" value={search} onChange={e => onSearchChange(e.target.value)} />
       <Text type="secondary">本批 {items.length} 人 · 点击切换右侧详情</Text>
     </div>
     {items.map(item => {
       const status = STATUS_MAP[item.status] || STATUS_MAP.pending;
       return (
-        <div
-          key={item.key}
-          className={`candidate-list-item${item.key === activeKey ? ' is-active' : ''}`}
-          onClick={() => onSelect(item.key)}
-        >
+        <div key={item.key} className={`candidate-list-item${item.key === activeKey ? ' is-active' : ''}`} onClick={() => onSelect(item.key)}>
           <div className="candidate-list-item-main">
-            <Avatar style={{ backgroundColor: item.key === activeKey ? '#1677ff' : '#87d068' }}>
-              {item.name.slice(-2)}
-            </Avatar>
+            <Avatar style={{ backgroundColor: item.key === activeKey ? '#1677ff' : '#87d068' }}>{item.name.slice(-2)}</Avatar>
             <div className="candidate-list-item-body">
               <div className="candidate-list-item-title">{item.name}</div>
               <div className="candidate-list-item-meta">
@@ -219,8 +186,7 @@ const CandidateDetail = ({ candidate }) => {
     return null;
   }
   const status = STATUS_MAP[candidate.status] || STATUS_MAP.pending;
-  const avgScore =
-    Object.values(candidate.scores).reduce((a, b) => a + b, 0) / Object.values(candidate.scores).length;
+  const avgScore = Object.values(candidate.scores).reduce((a, b) => a + b, 0) / Object.values(candidate.scores).length;
 
   return (
     <div className="candidate-detail">
@@ -238,9 +204,7 @@ const CandidateDetail = ({ candidate }) => {
         </div>
         <div style={{ textAlign: 'right' }}>
           <Text type="secondary">综合</Text>
-          <div style={{ fontSize: 28, fontWeight: 600, color: '#1677ff', lineHeight: 1.2 }}>
-            {avgScore.toFixed(1)}
-          </div>
+          <div style={{ fontSize: 28, fontWeight: 600, color: '#1677ff', lineHeight: 1.2 }}>{avgScore.toFixed(1)}</div>
         </div>
       </div>
 
@@ -289,12 +253,7 @@ const useCandidatePanel = () => {
     if (!q) {
       return ALL_CANDIDATES;
     }
-    return ALL_CANDIDATES.filter(
-      c =>
-        c.name.toLowerCase().includes(q) ||
-        c.role.toLowerCase().includes(q) ||
-        c.city.toLowerCase().includes(q)
-    );
+    return ALL_CANDIDATES.filter(c => c.name.toLowerCase().includes(q) || c.role.toLowerCase().includes(q) || c.city.toLowerCase().includes(q));
   }, [search]);
 
   const current = filtered.find(item => item.key === active) || filtered[0];
@@ -308,13 +267,7 @@ const ColumnsPane = () => {
   return (
     <ColumnsLayout widths={['34%', '1fr']}>
       <ScrollRegion>
-        <CandidateList
-          items={filtered}
-          activeKey={current?.key}
-          onSelect={setActive}
-          search={search}
-          onSearchChange={setSearch}
-        />
+        <CandidateList items={filtered} activeKey={current?.key} onSelect={setActive} search={search} onSearchChange={setSearch} />
       </ScrollRegion>
       <ScrollRegion inset>
         <CandidateDetail candidate={current} />
@@ -329,22 +282,10 @@ const SplitterPane = () => {
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
       <p className="demo-panel-hint">可拖拽中间分隔条调整列表宽度，左右列仍各自 SimpleBar 滚动。</p>
-      <Splitter
-        className={modalClassNames.splitter}
-        style={{ flex: 1, minHeight: 0 }}
-        defaultSize="34%"
-        min="240"
-        max="52%"
-      >
+      <Splitter className={modalClassNames.splitter} style={{ flex: 1, minHeight: 0 }} defaultSize="34%" min="240" max="52%">
         <Splitter.Panel>
           <ScrollRegion>
-            <CandidateList
-              items={filtered}
-              activeKey={current?.key}
-              onSelect={setActive}
-              search={search}
-              onSearchChange={setSearch}
-            />
+            <CandidateList items={filtered} activeKey={current?.key} onSelect={setActive} search={search} onSearchChange={setSearch} />
           </ScrollRegion>
         </Splitter.Panel>
         <Splitter.Panel>
@@ -497,6 +438,7 @@ const ExtendLayoutExample = () => {
 
 render(
   <App>
+    <ModalContextHolder />
     <DrawerContextHolder />
     <ExtendLayoutExample />
   </App>

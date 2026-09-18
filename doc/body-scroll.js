@@ -1,4 +1,4 @@
-const { default: Modal, Drawer, DrawerContextHolder } = _ReactModal;
+const { default: Modal, Drawer, DrawerContextHolder, ModalContextHolder } = _ReactModal;
 const { Button, Space, Typography, Divider, Radio, App } = antd;
 const { useState, useEffect } = React;
 
@@ -7,24 +7,15 @@ const { Title, Paragraph, Text } = Typography;
 const EVAL_SECTIONS = [
   {
     title: '沟通表达',
-    items: [
-      '表达结构清晰，能准确复述业务目标与技术约束。',
-      '对追问能够给出有层次的回答，而非堆砌名词。'
-    ]
+    items: ['表达结构清晰，能准确复述业务目标与技术约束。', '对追问能够给出有层次的回答，而非堆砌名词。']
   },
   {
     title: '专业深度',
-    items: [
-      '熟悉 React 渲染机制，能说明列表虚拟化方案选型理由。',
-      '了解前端监控与错误边界在生产环境的实践。'
-    ]
+    items: ['熟悉 React 渲染机制，能说明列表虚拟化方案选型理由。', '了解前端监控与错误边界在生产环境的实践。']
   },
   {
     title: '项目复杂度',
-    items: [
-      '参与过多团队协同的中台项目，承担核心模块 Owner。',
-      '能描述需求变更下的架构演进与风险控制。'
-    ]
+    items: ['参与过多团队协同的中台项目，承担核心模块 Owner。', '能描述需求变更下的架构演进与风险控制。']
   },
   {
     title: '协作推进',
@@ -98,24 +89,10 @@ const LongContentExample = () => {
         </Button>
         <Button onClick={() => setOpenSelfScroll(true)}>自管滚动（bodyScroll=false）</Button>
       </Space>
-      <Overlay
-        title="陈思远 · 面试评估纪要"
-        open={open}
-        onClose={() => setOpen(false)}
-        onConfirm={() => {}}
-        confirmText="保存纪要"
-        size={isDrawer ? 'default' : undefined}
-      >
+      <Overlay title="陈思远 · 面试评估纪要" open={open} onClose={() => setOpen(false)} onConfirm={() => {}} confirmText="保存纪要" size={isDrawer ? 'default' : undefined}>
         <EvaluationContent />
       </Overlay>
-      <Overlay
-        title="自管滚动示例"
-        open={openSelfScroll}
-        onClose={() => setOpenSelfScroll(false)}
-        bodyScroll={false}
-        footer={null}
-        size={isDrawer ? 'large' : undefined}
-      >
+      <Overlay title="自管滚动示例" open={openSelfScroll} onClose={() => setOpenSelfScroll(false)} bodyScroll={false} footer={null} size={isDrawer ? 'large' : undefined}>
         <div
           style={{
             height: `var(${contentHeightVar})`,
@@ -139,6 +116,7 @@ const LongContentExample = () => {
 
 render(
   <App>
+    <ModalContextHolder />
     <DrawerContextHolder />
     <LongContentExample />
   </App>

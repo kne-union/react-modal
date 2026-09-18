@@ -1,4 +1,4 @@
-const { default: Modal, useModal, useDrawer, DrawerContextHolder } = _ReactModal;
+const { default: Modal, useModal, useDrawer, DrawerContextHolder, ModalContextHolder } = _ReactModal;
 const { Button, Space, Typography, Tag, message, Checkbox, Radio, App } = antd;
 const { useState, useEffect } = React;
 const { Text, Paragraph } = Typography;
@@ -37,11 +37,7 @@ const NestProbe = ({ open, isDrawer }) => {
     return <Text type="secondary">打开内层后显示挂载探针</Text>;
   }
 
-  return (
-    <Tag color={info.hoisted ? 'success' : 'error'}>
-      内层 Modal {info.hoisted ? '已 hoist 到外层外侧' : '挂载异常'}
-    </Tag>
-  );
+  return <Tag color={info.hoisted ? 'success' : 'error'}>内层 Modal {info.hoisted ? '已 hoist 到外层外侧' : '挂载异常'}</Tag>;
 };
 
 const ExportFieldPicker = ({ isDrawer }) => {
@@ -51,8 +47,7 @@ const ExportFieldPicker = ({ isDrawer }) => {
   return (
     <div>
       <Paragraph>
-        已选择本批 <Text strong>8</Text> 位候选人。内层始终为声明式 Modal；外层当前为{' '}
-        <Text code>{isDrawer ? 'Drawer' : 'Modal'}</Text>。
+        已选择本批 <Text strong>8</Text> 位候选人。内层始终为声明式 Modal；外层当前为 <Text code>{isDrawer ? 'Drawer' : 'Modal'}</Text>。
       </Paragraph>
       <Space>
         <Button type="primary" onClick={() => setInnerOpen(true)}>
@@ -74,12 +69,7 @@ const ExportFieldPicker = ({ isDrawer }) => {
         }}
         confirmText="确认字段"
       >
-        <Checkbox.Group
-          style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
-          options={EXPORT_FIELDS}
-          value={checked}
-          onChange={setChecked}
-        />
+        <Checkbox.Group style={{ display: 'flex', flexDirection: 'column', gap: 10 }} options={EXPORT_FIELDS} value={checked} onChange={setChecked} />
       </Modal>
     </div>
   );
@@ -128,6 +118,7 @@ const NestedModalExample = () => {
 
 render(
   <App>
+    <ModalContextHolder />
     <DrawerContextHolder />
     <NestedModalExample />
   </App>

@@ -1,15 +1,17 @@
 import { useRef } from 'react';
-import { App, Button, Modal as AntdModal } from 'antd';
+import { Button, Modal as AntdModal } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
 import { usePopupMount, useScrollElement, hoistOutOfModalRoot } from '@kne/responsive-utils';
 import withLocale from './withLocale';
 import Footer from './Footer';
 import SimpleBar from './SimpleBar';
-import { lockParentScroll, useLockParentScroll } from './lockParentScroll';
+import { useLockParentScroll } from './lockParentScroll';
+import { ModalLayerProvider } from './ModalLayerContext';
 import style from './style.module.scss';
 
 export { lockParentScroll } from './lockParentScroll';
+export { ModalContextHolder, ModalLayerContext, useModalLayer } from './ModalLayerContext';
 
 const ModalLocaleRoot = withLocale(({ children }) => children);
 
@@ -258,7 +260,12 @@ const computedCommonProps = ({
           : null)
       }
     },
-    children: <ModalLocaleRoot>{runChildren({})}</ModalLocaleRoot>
+    // LayerProvider 须在 antd Modal 内容树内（ZIndexContext 下），内层命令式才能自动 +100
+    children: (
+      <ModalLocaleRoot>
+        <ModalLayerProvider>{runChildren({})}</ModalLayerProvider>
+      </ModalLocaleRoot>
+    )
   };
 };
 
@@ -302,60 +309,5 @@ const Modal = withLocale(({ size = 'default', getContainer, open, mobileFullscre
     </>
   );
 });
-
-export const useModal = () => {
-  const { modal } = App.useApp();
-  const { resolveMount, getPopupContainer } = usePopupMount(viewportPopupMountOptions);
-  const getScrollElement = useScrollElement();
-
-  return props => {
-    const anchor = typeof document !== 'undefined' ? document.activeElement : null;
-    const { isMobile, fixedModeClass } = resolveMount(anchor);
-    const unlock = lockParentScroll(getScrollElement);
-    const api = {};
-    const { afterClose: userAfterClose, getContainer: customGetContainer, onClose: userOnClose, onConfirm: userOnConfirm, onCancel: userOnCancel, ...restProps } = props;
-
-    const closeModal = () => {
-      api.close?.();
-    };
-
-    const { children, getContainer, afterClose, ...otherProps } = computedCommonProps({
-      ...restProps,
-      isMobile,
-      fixedModeClass,
-      onClose: () => {
-        userOnClose?.();
-        closeModal();
-      },
-      onCancel: (...args) => {
-        userOnCancel?.(...args);
-        closeModal();
-      },
-      onConfirm: async (...args) => {
-        const res = await Promise.resolve(userOnConfirm?.(...args));
-        if (res !== false) {
-          closeModal();
-        }
-        return res;
-      },
-      afterClose: (...args) => {
-        unlock();
-        userAfterClose?.(...args);
-      }
-    });
-    const { destroy } = modal.info({
-      ...otherProps,
-      afterClose,
-      content: children,
-      getContainer: resolveModalGetContainer({
-        customGetContainer: customGetContainer ?? getContainer,
-        getPopupContainer,
-        getHostNode: () => anchor
-      })
-    });
-    api.close = destroy;
-    return api;
-  };
-};
 
 export default Modal;

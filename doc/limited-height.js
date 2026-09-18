@@ -1,4 +1,4 @@
-const { default: Modal, useModal, DrawerContextHolder } = _ReactModal;
+const { default: Modal, useModal, DrawerContextHolder, ModalContextHolder } = _ReactModal;
 const { Button, Space, Radio, Typography, App } = antd;
 const { useState } = React;
 
@@ -43,7 +43,7 @@ const LimitedHeightExample = () => {
           size="small"
           options={[
             { label: '声明式 Modal', value: 'declarative' },
-            { label: 'useModal（info）', value: 'imperative' }
+            { label: 'useModal（命令式）', value: 'imperative' }
           ]}
           onChange={e => setMode(e.target.value)}
         />
@@ -63,9 +63,7 @@ const LimitedHeightExample = () => {
       >
         打开高度受限弹窗
       </Button>
-      <Text type="secondary">
-        useModal 走 antd modal.info，已覆盖 <code>.ant-modal-confirm-paragraph</code> 的 12px 宽度扣减。
-      </Text>
+      <Text type="secondary">useModal 走声明式 Modal（经 ModalContextHolder 就近 patch），与声明式同一套 chrome。</Text>
       {mode === 'declarative' ? (
         <Modal {...overlayProps} open={open}>
           {content}
@@ -77,6 +75,7 @@ const LimitedHeightExample = () => {
 
 render(
   <App>
+    <ModalContextHolder />
     <DrawerContextHolder />
     <LimitedHeightExample />
   </App>

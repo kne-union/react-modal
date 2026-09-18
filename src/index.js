@@ -1,6 +1,7 @@
 import './layouts.module.scss';
 
-export { default, useModal } from './Modal';
+export { default, ModalContextHolder, ModalLayerContext, useModalLayer } from './Modal';
+export { useModal } from './useModal';
 export { default as Drawer } from './Drawer';
 export { DrawerContextHolder, useDrawer } from './useDrawer';
 export { useConfirmModal } from './useConfirmModal';
