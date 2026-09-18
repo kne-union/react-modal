@@ -56,6 +56,7 @@ export const resolveModalGetContainer = ({ customGetContainer, getPopupContainer
 };
 
 const sizeStyleVars = (size, hasFooter) => {
+  // body 最低高度随 size：small 基准 300，default/large 基准 500（再扣 title/footer chrome）
   const minBase = size === 'small' ? 300 : 500;
   const chrome = 48 + (hasFooter ? 58 : 0);
   const minHeight = `${Math.max(0, minBase - chrome)}px`;
@@ -91,8 +92,16 @@ const ModalOuter = ({ title, footer, footerButtons, noPadding, onClose, closable
 
   const bodyClassName = classnames(style['modal-body'], 'modal-body');
   // 移动端全屏：body 用 flex 吃满 title/footer 之间剩余高度，footer 才能贴底；
-  // 勿写死 --kne-modal-body-height（高度受限类会把该值压矮，footer 悬在中间）
-  const bodyStyle = isMobile ? { flex: '1 1 auto', minHeight: 0, height: 'auto' } : { height: 'var(--kne-modal-body-height)' };
+  // 桌面默认：height:auto + max-height，短内容不撑满；bodyScroll=false 仍写死满高供 Tabs/分栏
+  const bodyStyle = isMobile
+    ? { flex: '1 1 auto', minHeight: 0, height: 'auto' }
+    : bodyScroll !== false
+      ? {
+          height: 'auto',
+          maxHeight: 'var(--kne-modal-body-max-height)',
+          minHeight: 'var(--kne-modal-body-min-height)'
+        }
+      : { height: 'var(--kne-modal-body-height)' };
 
   return (
     <div
@@ -122,7 +131,7 @@ const ModalOuter = ({ title, footer, footerButtons, noPadding, onClose, closable
           {bodyInner}
         </SimpleBar>
       ) : (
-        <div className={classnames(bodyClassName, style['body-scroll-off'])} style={isMobile ? { flex: '1 1 auto', minHeight: 0 } : undefined}>
+        <div className={classnames(bodyClassName, style['body-scroll-off'])} style={bodyStyle}>
           {bodyInner}
         </div>
       )}
