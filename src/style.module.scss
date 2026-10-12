@@ -20,12 +20,6 @@
     --kne-modal-body-min-height: 252px;
   }
 
-  &.large {
-    .modal-body-inner {
-      min-width: 1000px;
-    }
-  }
-
   &.is-mobile {
     --kne-modal-viewport-gutter: 0px;
     --kne-modal-body-padding-vertical: 24px;
@@ -37,12 +31,6 @@
     margin: 0 !important;
     top: 0 !important;
     padding-bottom: 0 !important;
-
-    &.large {
-      .modal-body-inner {
-        min-width: 0;
-      }
-    }
   }
 
   .modal-container {
