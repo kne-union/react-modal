@@ -179,6 +179,37 @@
   &.is-mobile {
     justify-content: center;
     border-top: 1px solid var(--bg-color-grey-3, #f0f0f0);
+
+    /* 按钮等分占满一行；放不下的由 ButtonGroup 收进「更多」，「更多」保持自身宽度 */
+    .modal-footer-actions {
+      flex: 1 1 auto;
+
+      :global {
+        .ant-space {
+          width: 100%;
+        }
+
+        .ant-space-item {
+          flex: 1 1 0;
+          min-width: 0;
+        }
+
+        .ant-space-item:not(:has(> .button-group-item)) {
+          flex: none;
+        }
+
+        .ant-space-item > .button-group-item {
+          width: 100%;
+        }
+
+        /* 统一高度，压过 react-form-antd 移动端 .react-form__action-button 的 48px */
+        .ant-space-item .ant-btn {
+          height: 40px;
+          font-size: 15px;
+          border-radius: 4px;
+        }
+      }
+    }
   }
 
   /* footerButtons=[] + 宿主 footer（如 FormModal Submit/Cancel） */
@@ -367,6 +398,11 @@
 }
 
 @include resp.mobile-container {
+  .modal {
+    /* 移动端 footer: 12 + 40 按钮 + 16 + 1 border */
+    --kne-modal-footer-height: 69px;
+  }
+
   .modal-body-inner:not(.no-padding) {
     --kne-modal-body-padding-vertical: 24px;
     --kne-modal-body-padding-horizontal: 24px;

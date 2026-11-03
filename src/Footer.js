@@ -55,7 +55,7 @@ const Footer = ({ footer, footerButtons, onConfirm, onCancel, cancelText, confir
       {showFooterSlot ? <div className={style['modal-footer-extra']}>{footer}</div> : null}
       {showButtons ? (
         <div className={style['modal-footer-actions']}>
-          <ButtonGroup list={list} showLength={list.length} place={isMobile ? 'center' : 'end'} />
+          <ButtonGroup list={list} showLength={isMobile ? undefined : list.length} place={isMobile ? 'center' : 'end'} />
         </div>
       ) : null}
     </div>

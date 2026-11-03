@@ -376,8 +376,8 @@
 
 @include resp.mobile-container {
   .drawer {
-    /* 移动端 footer: 12 + ~32 + 16 + 1 border */
-    --kne-drawer-footer-height: 61px;
+    /* 移动端 footer: 12 + 40 按钮 + 16 + 1 border */
+    --kne-drawer-footer-height: 69px;
   }
 
   .drawer-body-inner:not(.no-padding) {
